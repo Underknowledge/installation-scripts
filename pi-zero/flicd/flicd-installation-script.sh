@@ -38,7 +38,12 @@ echo "make done!"
 echo ""
 echo "setting up crontab" 
 (sudo crontab -u root -l; echo "@reboot systemctl stop bluetooth" ) | sudo crontab -u root -
-echo ""
+echo "creating some aliases"
+sed -i "/ls -CF/ a alias bluetoothinfos='sudo btmon'" ~/.bashrc 
+sed -i "/ls -CF/ a fliclog='journalctl -u flicd -f'" ~/.bashrc 
+sed -i "/ls -CF/ a fliclogs='tail -f /home/pi/flic/flic_log.txt'" ~/.bashrc 
+sed -i "/ls -CF/ a alias simpleclient='/home/pi/simpleclient/simpleclient localhost'" ~/.bashrc 
+exec bash
 echo ""
 echo "run simpleclient with '/home/pi/simpleclient/simpleclient localhost'"
 echo " Done " 
