@@ -1,7 +1,5 @@
 #!/bin/sh
 mkdir /home/pi/flic/
-#binary
-
 echo ""
 echo "Downloading  armv6l/flicd "
 curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/bin/armv6l/flicd > /usr/local/bin/flicd
@@ -38,7 +36,7 @@ echo "make"
 make
 echo "make done!"
 echo ""
-echo "TEST FOR AN ROOT CHRON TAB!" 
+echo "setting up crontab" 
 (sudo crontab -u root -l; echo "@reboot systemctl stop bluetooth" ) | sudo crontab -u root -
 echo ""
 echo ""
