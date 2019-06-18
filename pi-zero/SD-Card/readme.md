@@ -9,3 +9,9 @@
 **Banner** 
 
 ` $ sudo apt-get install figlet && figlet -c "XXXXYYYY" > ~/banner && echo "cat banner" >> ~/.bashrc ` 
+
+**Cron jobs** 
+
+` $ sudo crontab -e` 
+
+` @reboot xy.sh `
