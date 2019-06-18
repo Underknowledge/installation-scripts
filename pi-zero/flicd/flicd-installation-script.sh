@@ -26,27 +26,30 @@ echo "Downloading the sinple client"
 curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/simpleclient/Makefile > ~/simpleclient/Makefile
 curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/simpleclient/simpleclient.cpp> ~/simpleclient/simpleclient.cpp
 curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/simpleclient/client_protocol_packets.h> ~/simpleclient/client_protocol_packets.h
-echo ""
-echo ""
 echo "cd" 
 cd simpleclient
-echo ""
-echo ""
 echo "make" 
 make
 echo "make done!"
-echo ""
+echo "cleaning up the setup files "
+rm ~/simpleclient/Makefile
+rm ~/simpleclient/simpleclient.cpp
+rm ~/simpleclient/client_protocol_packets.h
 echo "setting up crontab" 
 (sudo crontab -u root -l; echo "@reboot systemctl stop bluetooth" ) | sudo crontab -u root -
 echo "creating some aliases"
-sed -i "/ls -CF/ a alias bluetoothinfos='sudo btmon'" ~/.bashrc 
+sed -i "/ls -CF/ a alias btinfo='sudo btmon'" ~/.bashrc 
 sed -i "/ls -CF/ a fliclog='journalctl -u flicd -f'" ~/.bashrc 
 sed -i "/ls -CF/ a fliclogs='tail -f /home/pi/flic/flic_log.txt'" ~/.bashrc 
 sed -i "/ls -CF/ a alias simpleclient='/home/pi/simpleclient/simpleclient localhost'" ~/.bashrc 
+sed -i "/ls -CF/ a alias flicstart='sudo systemctl start flicd.service'" ~/.bashrc 
+sed -i "/ls -CF/ a alias flicstop='sudo systemctl stop flicd.service'" ~/.bashrc 
+sed -i "/ls -CF/ a alias flicrestart='sudo systemctl restart flicd.service'" ~/.bashrc 
+sed -i "/ls -CF/ a alias flicstatus='sudo systemctl status flicd.service'" ~/.bashrc 
 exec bash
 echo ""
-echo "run simpleclient with '/home/pi/simpleclient/simpleclient localhost'"
+echo "run simpleclient with '/home/pi/simpleclient/simpleclient localhost' or just"
 echo " Done " 
-echo " check for errors with 'journalctl -u flicd -f' "
-echo " 'sudo btmon' for the actuall bt actions "
+echo " check for errors with 'journalctl -u flicd -f'  the alias is `fliclog` "
+echo " 'sudo btmon' for the actuall bt actions alias is `btinfo`"
 echo " 'dmesg' for kernel errors - good luck "
