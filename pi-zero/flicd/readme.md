@@ -1,8 +1,8 @@
 
 
 ``` 
-  $ curl https://raw.githubusercontent.com/Underknowledge/installation-scripts/master/pi-zero/flicd/flicd-installation-scripts.sh > ~/flicd-installation-scripts.sh
-  $ sudo chmod +x ~/flicd-installation-scripts.sh
+  $ curl https://raw.githubusercontent.com/Underknowledge/installation-scripts/master/pi-zero/flicd/flicd-installation-script.sh > ~/flicd-installation-script.sh
+  $ sudo chmod +x ~/flicd-installation-script.sh
   $ cd ~
-  $ ./flicd-installation-scripts.sh
+  $ ./flicd-installation-script.sh
 ``` 
