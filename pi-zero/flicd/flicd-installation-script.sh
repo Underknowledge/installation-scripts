@@ -1,5 +1,4 @@
 #!/bin/sh
-
 mkdir /home/pi/flic/
 #binary
 
@@ -7,17 +6,14 @@ echo ""
 echo "Downloading  armv6l/flicd "
 curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/bin/armv6l/flicd > /usr/local/bin/flicd
 chmod a+x /usr/local/bin/flicd
-
 echo ""
 echo "Downloading  systemd file and make it executable "
 curl https://raw.githubusercontent.com/Underknowledge/installation-scripts/pi-zero/flicd/flicd.service > /etc/systemd/system/flicd.service
 chmod a+x /etc/systemd/system/flicd.service
-
 echo ""
 echo "Disableing Bluetooth" 
 sudo systemctl stop bluetooth
 sudo systemctl disable bluetooth
-
 echo ""
 echo " enabling the new flicd.service" 
 sudo systemctl enable flicd.service
@@ -42,7 +38,8 @@ echo "make"
 make
 echo "make done!"
 echo ""
-echo "" 
+echo "TEST FOR AN ROOT CHRON TAB!" 
+(sudo crontab -u root -l; echo "@reboot systemctl stop bluetooth" ) | sudo crontab -u root -
 echo ""
 echo ""
 echo "run simpleclient with '/home/pi/simpleclient/simpleclient localhost'"
