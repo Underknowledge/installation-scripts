@@ -48,7 +48,7 @@ sed -i "/ls -CF/ a alias flicrestart='sudo systemctl restart flicd.service'" ~/.
 sed -i "/ls -CF/ a alias flicstatus='sudo systemctl status flicd.service'" ~/.bashrc 
 exec bash
 echo ""
-echo "run simpleclient with '/home/pi/simpleclient/simpleclient localhost' or just"
+echo "run simpleclient with 'simpleclient` "
 echo " Done " 
 echo " check for errors with 'journalctl -u flicd -f'  the alias is `fliclog` "
 echo " 'sudo btmon' for the actuall bt actions alias is `btinfo`"
