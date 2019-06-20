@@ -16,10 +16,10 @@ echo
 read -n 1 -s -r -p "Press any key to continue"
 echo 
 mkdir /home/pi/flic/
-echo "Downloading  armv6l/flicd "
+echo "Downloading armv6l/flicd"
 curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/bin/armv6l/flicd > /usr/local/bin/flicd
 chmod a+x /usr/local/bin/flicd
-echo "Downloading  systemd file and make it executable "
+echo "Downloading systemd file and make it executable"
 curl https://raw.githubusercontent.com/Underknowledge/installation-scripts/pi-zero/flicd/flicd.service > /etc/systemd/system/flicd.service
 chmod a+x /etc/systemd/system/flicd.service
 echo "Disableing Bluetooth" 
