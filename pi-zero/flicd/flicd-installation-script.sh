@@ -1,4 +1,16 @@
 #!/bin/sh
+echo "========================================================"
+echo "This short script will install a flic deamon on a Raspberry Pi "
+echo "https://github.com/50ButtonsEach/fliclib-linux-hci"  
+echo ""
+echo "========================================================"
+echo   
+echo "type yes to move on "
+read  
+if [ "$REPLY" != "yes" ]; then
+   exit
+fi  
+echo 
 mkdir /home/pi/flic/
 echo
 echo "Downloading  armv6l/flicd "
@@ -38,16 +50,7 @@ rm ~/simpleclient/client_protocol_packets.h
 echo "setting up crontab" 
 (sudo crontab -u root -l; echo "@reboot systemctl stop bluetooth" ) | sudo crontab -u root -
 echo "creating some aliases"
-sed -i "/ls -CF/ a alias btinfo='sudo btmon'" ~/.bashrc 
-sed -i "/ls -CF/ a fliclog='journalctl -u flicd -f'" ~/.bashrc 
-sed -i "/ls -CF/ a fliclogs='tail -f /home/pi/flic/flic_log.txt'" ~/.bashrc 
-sed -i "/ls -CF/ a alias simpleclient='/home/pi/simpleclient/simpleclient localhost'" ~/.bashrc 
-sed -i "/ls -CF/ a alias flicstart='sudo systemctl start flicd.service'" ~/.bashrc 
-sed -i "/ls -CF/ a alias flicstop='sudo systemctl stop flicd.service'" ~/.bashrc 
-sed -i "/ls -CF/ a alias flicrestart='sudo systemctl restart flicd.service'" ~/.bashrc 
-sed -i "/ls -CF/ a alias flicenable='sudo systemctl enable flicd.service'" ~/.bashrc 
-sed -i "/ls -CF/ a alias flicdisable='sudo systemctl disable flicd.service'" ~/.bashrc 
-sed -i "/ls -CF/ a alias flickill='sudo systemctl stop flicd.service && sudo rm /home/pi/flic/flic.sqlite3 && sudo reboot'" ~/.bashrc 
+sed -i "/ls -CF/ a alias resetflicdaemon='sudo systemctl stop flicd.service && sudo rm /home/pi/flic/flic.sqlite3 && sudo reboot'" ~/.bashrc 
 exec bash
 echo
 echo " run simpleclient with 'simpleclient` "
