@@ -1,7 +1,7 @@
 
 
-right-click save link as: 
-https://raw.githubusercontent.com/Underknowledge/installation-scripts/master/pi-zero/SD-Card/wpa_supplicant.conf
+right-click save link as: <br>
+https://raw.githubusercontent.com/Underknowledge/installation-scripts/master/pi-zero/SD-Card/wpa_supplicant.conf <br>
 https://raw.githubusercontent.com/Underknowledge/installation-scripts/master/pi-zero/SD-Card/ssh
 and moove them to the root of the `boot` partition 
 
