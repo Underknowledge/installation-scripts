@@ -45,6 +45,8 @@ echo
 sudo sed -i 's/#PasswordAuthentication\ yes/PasswordAuthentication\ no/g' /etc/ssh/sshd_config 
 echo " PasswordAuthentication no"
 echo
+sudo service ssh reload
+echo " reloading ssh service"
 echo
 echo "already finished!"
 echo
