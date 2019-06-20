@@ -33,7 +33,7 @@ after your pi is restarted you can login with your new set password and run this
 https://raw.githubusercontent.com/Underknowledge/installation-scripts/master/pi-zero/initial_setup/enable-ssh-keys.sh > ~/enable-ssh-keys.sh
   $ sudo chmod +x ~/enable-ssh-keys.sh
   $ cd ~
-  $ sudo ./enable-ssh-keys.sh
+  $ ./enable-ssh-keys.sh
 ``` 
 
 
