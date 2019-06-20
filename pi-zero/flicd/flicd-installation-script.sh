@@ -45,7 +45,9 @@ sed -i "/ls -CF/ a alias simpleclient='/home/pi/simpleclient/simpleclient localh
 sed -i "/ls -CF/ a alias flicstart='sudo systemctl start flicd.service'" ~/.bashrc 
 sed -i "/ls -CF/ a alias flicstop='sudo systemctl stop flicd.service'" ~/.bashrc 
 sed -i "/ls -CF/ a alias flicrestart='sudo systemctl restart flicd.service'" ~/.bashrc 
-sed -i "/ls -CF/ a alias flicstatus='sudo systemctl status flicd.service'" ~/.bashrc 
+sed -i "/ls -CF/ a alias flicenable='sudo systemctl enable flicd.service'" ~/.bashrc 
+sed -i "/ls -CF/ a alias flicdisable='sudo systemctl disable flicd.service'" ~/.bashrc 
+sed -i "/ls -CF/ a alias flickill='sudo systemctl stop flicd.service && sudo rm /home/pi/flic/flic.sqlite3 && sudo reboot'" ~/.bashrc 
 exec bash
 echo
 echo " run simpleclient with 'simpleclient` "
