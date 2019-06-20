@@ -1,4 +1,12 @@
 
+
+
+https://raw.githubusercontent.com/Underknowledge/installation-scripts/master/pi-zero/SD-Card/wpa_supplicant.conf
+
+https://raw.githubusercontent.com/Underknowledge/installation-scripts/master/pi-zero/SD-Card/ssh
+
+
+
  `sudo raspi-config`
  
  
