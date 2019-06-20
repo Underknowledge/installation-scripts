@@ -36,7 +36,6 @@ echo "Downloading the sinple client"
 curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/simpleclient/Makefile > ~/simpleclient/Makefile
 curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/simpleclient/simpleclient.cpp> ~/simpleclient/simpleclient.cpp
 curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/simpleclient/client_protocol_packets.h> ~/simpleclient/client_protocol_packets.h
-echo "cd" 
 cd simpleclient
 echo "make" 
 make
@@ -61,9 +60,9 @@ echo "========================================================"
 echo
 echo
 echo "to pair a button just press it for +7 secconds" 
-echo "When you faceing issues pairing run 'resetflicdaemon' it will delete the database and reboot the pi"
+echo "when you facing issues pairing run 'resetflicdaemon' it will delete the database and reboot the pi"
 echo
-echo "simpleclient is compiled and you can start it with 'simpleclient'"
+echo "simpleclient is compiled and you can start it with 'simpleclient'           ... simple"
 read -n 1 -s -r -p "Press any key to continue"
 echo 
 exec bash
