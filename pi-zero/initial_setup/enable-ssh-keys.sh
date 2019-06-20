@@ -21,7 +21,6 @@ if [ "$REPLY" != "yes" ]; then
 fi  
 echo   
 echo " sorry that I'm aggravating, are you shure that you installed the key? "
-echo   
 echo " type yes once more to move on "
 read  
 if [ "$REPLY" != "yes" ]; then
