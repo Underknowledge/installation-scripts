@@ -15,10 +15,6 @@ echo
 echo 
 read -n 1 -s -r -p "Press any key to continue"
 echo 
-
-
-#  pi - needs to be fixed
-mkdir /home/pi/flic/
 echo "Downloading ${hardware}/flicd"
 #  curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/bin/armv6l/flicd > /usr/local/bin/flicd
 case $(uname -m) in
@@ -38,31 +34,12 @@ echo "enabling the new flicd.service"
 sudo systemctl enable flicd.service
 sudo systemctl start flicd.service
 echo "creating the dir "
-mkdir ~/simpleclient
 echo
 echo
-echo "Downloading the sinple client" 
-#
-#
-# diffrent folder?
-curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/simpleclient/Makefile > ~/simpleclient/Makefile
-curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/simpleclient/simpleclient.cpp> ~/simpleclient/simpleclient.cpp
-curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/simpleclient/client_protocol_packets.h> ~/simpleclient/client_protocol_packets.h
-cd simpleclient
-echo "make" 
-make
-echo "make done!"
-echo "cleaning up the setup files "
-
-# 47
-rm ~/simpleclient/Makefile
-rm ~/simpleclient/simpleclient.cpp
-rm ~/simpleclient/client_protocol_packets.h
 echo "setting up crontab" 
 (sudo crontab -u root -l; echo "@reboot systemctl stop bluetooth" ) | sudo crontab -u root -
-echo "creating some aliases"
-sed -i "/ls -CF/ a alias resetflicdaemon='sudo systemctl stop flicd.service && sudo rm /home/pi/flic/flic.sqlite3 && sudo reboot'" ~/.bashrc 
-sed -i "/ls -CF/ a alias simpleclient='/home/pi/simpleclient/simpleclient localhost'" ~/.bashrc 
+echo "creating resetflicdaemon alias"
+sed -i "/ls -CF/ a alias resetflicdaemon='sudo systemctl stop flicd.service && sudo rm /var/flic.db && sudo reboot'" ~/.bashrc 
 echo
 echo
 echo "you can add the following 3 lines to your Home Assistant config to use this pi as flic server" 
@@ -76,7 +53,6 @@ echo
 echo "to pair a button just press it for +7 secconds" 
 echo "when you facing issues pairing run 'resetflicdaemon' it will delete the database and reboot the pi"
 echo
-echo "simpleclient is compiled and you can start it with 'simpleclient'           ... simple"
 read -n 1 -s -r -p "Press any key to continue"
 echo 
 exec bash
