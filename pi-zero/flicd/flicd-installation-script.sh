@@ -1,9 +1,6 @@
 #!/bin/bash
 hardware=$(uname -m)
 ipadress=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
-##if [ "${hardware}" != "armv6l" ]; then
-##   echo "sorry" && echo "this script is thought for raspberry pi's or other hardware using armv6l " && exit
-##fi
 echo 
 echo 
 echo "========================================================"
