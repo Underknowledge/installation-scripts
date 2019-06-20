@@ -66,3 +66,4 @@ echo "simpleclient is compiled and you can start it with 'simpleclient'         
 read -n 1 -s -r -p "Press any key to continue"
 echo 
 exec bash
+exit 0
