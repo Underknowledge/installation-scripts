@@ -5,7 +5,7 @@ After=bluetooth.service
 [Service]
 Type=simple
 User=root
-ExecStart=/usr/local/bin/flicd -w -s 0.0.0.0 -p 5551 -l /home/pi/flic/flic_log.txt -f /home/pi/flic/flic.sqlite3
+ExecStart=/usr/local/bin/flicd -w -s 0.0.0.0 -p 5551 -l /var/log/flic_log -f /var/flic.db
 Restart=always
 RestartSec=10
 
