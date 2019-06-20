@@ -18,4 +18,17 @@ https://raw.githubusercontent.com/Underknowledge/installation-scripts/master/pi-
   $ ./enable-ssh-keys.sh
 ``` 
 
- `
+
+
+
+**Banner** 
+
+` $ sudo apt-get install figlet && figlet -c "XXXXYYYY" > ~/banner && echo "cat banner" >> ~/.bashrc ` 
+
+
+
+**Cron jobs** 
+
+` $ sudo crontab -e` 
+
+` @reboot xy.sh `
