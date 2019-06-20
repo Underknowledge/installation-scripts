@@ -4,33 +4,31 @@ ipadress=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9
 if [ "${hardware}" != "armv6l" ]; then
    echo "sorry" && echo "this script is thought for raspberry pi's or other hardware using armv6l " && exit
 fi
+echo 
+echo 
+echo 
 echo "========================================================"
 echo "This short script will install a flic deamon on a Raspberry Pi "
 echo "https://github.com/50ButtonsEach/fliclib-linux-hci" 
 echo ""
 echo "========================================================"
 echo 
+echo 
 read -n 1 -s -r -p "Press any key to continue"
 echo 
 mkdir /home/pi/flic/
-echo
 echo "Downloading  armv6l/flicd "
 curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/bin/armv6l/flicd > /usr/local/bin/flicd
 chmod a+x /usr/local/bin/flicd
-echo
 echo "Downloading  systemd file and make it executable "
 curl https://raw.githubusercontent.com/Underknowledge/installation-scripts/pi-zero/flicd/flicd.service > /etc/systemd/system/flicd.service
 chmod a+x /etc/systemd/system/flicd.service
-echo
 echo "Disableing Bluetooth" 
 sudo systemctl stop bluetooth
 sudo systemctl disable bluetooth
-echo
 echo " enabling the new flicd.service" 
 sudo systemctl enable flicd.service
 sudo systemctl start flicd.service
-echo
-echo
 echo "creating the dir "
 mkdir ~/simpleclient
 echo
@@ -59,8 +57,11 @@ echo "binary_sensor:"
 echo "  - platform: flic"
 echo "    host: ${ipadress} "
 echo "========================================================"
+echo
+echo
 echo "to pair a button just press it for +7 secconds" 
 echo "When you faceing issues pairing run 'resetflicdaemon' it will delete the database and reboot the pi"
+echo
 echo "simpleclient is compiled and you can start it with 'simpleclient'"
 read -n 1 -s -r -p "Press any key to continue"
 echo 
