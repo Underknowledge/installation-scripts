@@ -1,10 +1,15 @@
 #!/bin/sh
+hardware=$(uname -m)
+ipadress=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
+if [ "${hardware}" != "armv6l" ]; then
+   echo "sorry" && echo "this script is thought for raspberry pi's or other hardware running ${hardware} " && exit
+fi
 echo "========================================================"
 echo "This short script will install a flic deamon on a Raspberry Pi "
-echo "https://github.com/50ButtonsEach/fliclib-linux-hci"  
+echo "https://github.com/50ButtonsEach/fliclib-linux-hci" 
 echo ""
 echo "========================================================"
-echo   
+echo 
 echo "type yes to move on "
 read  
 if [ "$REPLY" != "yes" ]; then
@@ -52,7 +57,7 @@ echo "setting up crontab"
 echo "creating some aliases"
 sed -i "/ls -CF/ a alias resetflicdaemon='sudo systemctl stop flicd.service && sudo rm /home/pi/flic/flic.sqlite3 && sudo reboot'" ~/.bashrc 
 exec bash
-echo
+echo "${ipadress} "
 echo " run simpleclient with 'simpleclient` "
 echo " Done " 
 echo " check for errors with 'journalctl -u flicd -f'  the alias is `fliclog` "
