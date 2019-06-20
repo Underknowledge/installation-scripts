@@ -9,7 +9,7 @@
  instead of updating with the raspi-config script I like to run: 
  `sudo apt-get update && sudo apt-get upgrade -y && sudo reboot` 
 
-
+after your pi is restarted you can login with your new set password and run this 3 to 4 commands. 
 ``` 
   $ curl 
 https://raw.githubusercontent.com/Underknowledge/installation-scripts/master/pi-zero/initial_setup/enable-ssh-keys.sh > ~/enable-ssh-keys.sh
