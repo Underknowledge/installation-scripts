@@ -25,14 +25,20 @@ if [ "$REPLY" != "yes" ]; then
 fi
 echo "========================================================"
 echo " OK! Lets do it! "
+echo
+echo
 sudo sed -i 's/#PermitRootLogin\ prohibit-password/PermitRootLogin no/g' /etc/ssh/sshd_config 
 echo " PermitRootLogin no "
+echo
 sudo sed -i 's/#PubkeyAuthentication\ yes/PubkeyAuthentication\ yes/g' /etc/ssh/sshd_config
 echo " uncomment PubkeyAuthentication "
+echo
 sudo sed -i 's/#MaxAuthTries.*/MaxAuthTries 3/g' /etc/ssh/sshd_config 
 echo " MaxAuthTries 3 "
+echo
 sudo sed -i 's/#AuthorizedKeysFile/AuthorizedKeysFile/g' /etc/ssh/sshd_config 
 echo " uncomment AuthorizedKeysFile "
+echo
 sudo sed -i 's/#PasswordAuthentication\ yes/PasswordAuthentication\ no/g' /etc/ssh/sshd_config 
 echo " PasswordAuthentication no"
 echo
