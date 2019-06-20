@@ -15,9 +15,18 @@ echo
 echo 
 read -n 1 -s -r -p "Press any key to continue"
 echo 
+
+
+#  pi - needs to be fixed
 mkdir /home/pi/flic/
-echo "Downloading armv6l/flicd"
-curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/bin/armv6l/flicd > /usr/local/bin/flicd
+echo "Downloading ${hardware}/flicd"
+#  curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/bin/armv6l/flicd > /usr/local/bin/flicd
+case $(uname -m) in
+    i386)    curl https://github.com/50ButtonsEach/fliclib-linux-hci/blob/master/bin/i386/flicd?raw=true > /usr/local/bin/flicd ;;
+    x86_64)  curl https://github.com/50ButtonsEach/fliclib-linux-hci/blob/master/bin/x86_64/flicd > /usr/local/bin/flicd ;;
+    armv6l)  curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/bin/armv6l/flicd > /usr/local/bin/flicd ;;
+    *) echo "Sorry, I can not get a $(uname -m) flic binary for you :(" && exit 1 ;;
+esac
 chmod a+x /usr/local/bin/flicd
 echo "Downloading systemd file and make it executable"
 curl https://raw.githubusercontent.com/Underknowledge/installation-scripts/pi-zero/flicd/flicd.service > /etc/systemd/system/flicd.service
@@ -33,6 +42,9 @@ mkdir ~/simpleclient
 echo
 echo
 echo "Downloading the sinple client" 
+#
+#
+# diffrent folder?
 curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/simpleclient/Makefile > ~/simpleclient/Makefile
 curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/simpleclient/simpleclient.cpp> ~/simpleclient/simpleclient.cpp
 curl https://raw.githubusercontent.com/50ButtonsEach/fliclib-linux-hci/master/simpleclient/client_protocol_packets.h> ~/simpleclient/client_protocol_packets.h
@@ -41,6 +53,8 @@ echo "make"
 make
 echo "make done!"
 echo "cleaning up the setup files "
+
+# 47
 rm ~/simpleclient/Makefile
 rm ~/simpleclient/simpleclient.cpp
 rm ~/simpleclient/client_protocol_packets.h
