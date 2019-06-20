@@ -6,7 +6,6 @@ if [ "${hardware}" != "armv6l" ]; then
 fi
 echo 
 echo 
-echo 
 echo "========================================================"
 echo "This short script will install a flic deamon on a Raspberry Pi "
 echo "https://github.com/50ButtonsEach/fliclib-linux-hci" 
@@ -26,7 +25,7 @@ chmod a+x /etc/systemd/system/flicd.service
 echo "Disableing Bluetooth" 
 sudo systemctl stop bluetooth
 sudo systemctl disable bluetooth
-echo " enabling the new flicd.service" 
+echo "enabling the new flicd.service" 
 sudo systemctl enable flicd.service
 sudo systemctl start flicd.service
 echo "creating the dir "
@@ -51,6 +50,8 @@ echo "setting up crontab"
 echo "creating some aliases"
 sed -i "/ls -CF/ a alias resetflicdaemon='sudo systemctl stop flicd.service && sudo rm /home/pi/flic/flic.sqlite3 && sudo reboot'" ~/.bashrc 
 sed -i "/ls -CF/ a alias simpleclient='/home/pi/simpleclient/simpleclient localhost'" ~/.bashrc 
+echo
+echo
 echo "you can add the following 3 lines to your Home Assistant config to use this pi as flic server" 
 echo "========================================================"
 echo "binary_sensor:"
