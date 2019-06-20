@@ -1,8 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 hardware=$(uname -m)
 ipadress=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
 if [ "${hardware}" != "armv6l" ]; then
-   echo "sorry" && echo "this script is thought for raspberry pi's or other hardware running ${hardware} " && exit
+   echo "sorry" && echo "this script is thought for raspberry pi's or other hardware using armv6l " && exit
 fi
 echo "========================================================"
 echo "This short script will install a flic deamon on a Raspberry Pi "
@@ -56,10 +56,15 @@ echo "setting up crontab"
 (sudo crontab -u root -l; echo "@reboot systemctl stop bluetooth" ) | sudo crontab -u root -
 echo "creating some aliases"
 sed -i "/ls -CF/ a alias resetflicdaemon='sudo systemctl stop flicd.service && sudo rm /home/pi/flic/flic.sqlite3 && sudo reboot'" ~/.bashrc 
+sed -i "/ls -CF/ a alias simpleclient='/home/pi/simpleclient/simpleclient localhost'" ~/.bashrc 
+echo "you can add the following 3 lines to your Home Assistant config to use this pi as flic server" 
+echo "========================================================"
+echo "binary_sensor:"
+echo "  - platform: flic"
+echo "    host: ${ipadress} "
+echo "========================================================"
+echo "to pair a button just press it for +7 secconds" 
+echo "When you faceing issues pairing run 'resetflicdaemon' it will delete the database and reboot the pi"
+echo "simpleclient is compiled and you can start it with 'simpleclient'"
+read -n 1 -s -r -p "Press any key to continue"
 exec bash
-echo "${ipadress} "
-echo " run simpleclient with 'simpleclient` "
-echo " Done " 
-echo " check for errors with 'journalctl -u flicd -f'  the alias is `fliclog` "
-echo " 'sudo btmon' for the actuall bt actions alias is `btinfo`"
-echo " 'dmesg' for kernel errors - good luck "
