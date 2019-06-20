@@ -18,7 +18,7 @@
 
 
 
-after your pi is restarted you can login with your new set password and run this 3 to 4 commands. 
+after your pi is restarted you can login with your new set password and run this 3 to 4 commands to enable ssh-keys
 
 
 ``` 
