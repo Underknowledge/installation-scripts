@@ -10,11 +10,7 @@ echo "https://github.com/50ButtonsEach/fliclib-linux-hci"
 echo ""
 echo "========================================================"
 echo 
-echo "type yes to move on "
-read  
-if [ "$REPLY" != "yes" ]; then
-   exit
-fi  
+read -n 1 -s -r -p "Press any key to continue"
 echo 
 mkdir /home/pi/flic/
 echo
@@ -67,4 +63,5 @@ echo "to pair a button just press it for +7 secconds"
 echo "When you faceing issues pairing run 'resetflicdaemon' it will delete the database and reboot the pi"
 echo "simpleclient is compiled and you can start it with 'simpleclient'"
 read -n 1 -s -r -p "Press any key to continue"
+echo 
 exec bash
