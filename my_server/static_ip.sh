@@ -22,6 +22,10 @@ sudo sed -i "s=iface $(ls /sys/class/net | grep enp) inet dhcp=iface $(ls /sys/c
 sudo sed -i "/iface $(ls /sys/class/net | grep enp) inet static/ a \ \ \ \ \ \ \ \ gateway 10.0.0.1" /etc/network/interfaces
 sudo sed -i "/iface $(ls /sys/class/net | grep enp) inet static/ a \ \ \ \ \ \ \ \ netmask 255.255.255.0" /etc/network/interfaces
 sudo sed -i "/iface $(ls /sys/class/net | grep enp) inet static/ a \ \ \ \ \ \ \ \ address 10.0.0.27" /etc/network/interfaces
+sudo sed -i "/gateway 10.0.0.1/ a #DNS configurations - only If resolvconf is installed" /etc/network/interfaces
+sudo sed -i "/#DNS configurations - only If resolvconf is installed/ a # check with 'dpkg -l | grep resolvconf' " /etc/network/interfaces
+sudo sed -i "/# check with 'dpkg -l | grep resolvconf'/ a # Otherwise edit the file:'/etc/resolv.conf' " /etc/network/interfaces
+sudo sed -i "/# Otherwise edit the file:'/etc/resolv.conf' / a #dns-nameservers 1.1.1.1" /etc/network/interfaces
 echo "========================================================"
 echo "        we will be back in a short moment !  "
 echo "========================================================"
