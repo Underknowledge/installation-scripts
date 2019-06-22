@@ -1,6 +1,5 @@
 #!/bin/bash
 eth_interface=$(ls /sys/class/net | grep enp) 
-eth_interface_v2=$(ip route | grep default | sed -e "s/^.*dev.//" -e "s/.proto.*//")
 echo "========================================================"
 echo "    This short script will set the network interface from DHCP to static "
 echo " "
