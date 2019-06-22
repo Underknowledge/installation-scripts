@@ -2,10 +2,11 @@
 eth_interface=$(ls /sys/class/net | grep enp) 
 echo "========================================================"
 echo "    This short script will set the network interface from DHCP to static "
-echo " "
-echo " " 
-echo " "
+echo
 echo "https://wiki.debian.org/NetworkConfiguration" 
+echo
+echo "of cause I find an easy to follow writeup when I`m finished..." 
+echo "https://medium.com/@cpt_midnight/static-ip-in-debian-9-stretch-acb4e5cb7dc1 "
 echo
 echo "you can get your original configuation with: "
 echo "sudo cp /etc/network/interfaces_backup /etc/network/interfaces"
@@ -31,8 +32,14 @@ echo "        we will be back in a short moment !  "
 echo "========================================================"
 sudo service networking restart
 sudo ifup $(ls /sys/class/net | grep enp)
-sleep 10
+sleep 5
 echo
+echo "running `dig home-assistant.io'"
+dig home-assistant.io
+sleep 5
+echo "running 'nslookup home-assistant.io'"
+nslookup home-assistant.io
+sleep 5
 echo "========================================================"
 echo "should be done now I ll send you to the file to check it now"
 echo "========================================================"
