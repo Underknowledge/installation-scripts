@@ -40,7 +40,7 @@ echo "========================================================"
 echo "        we will be back in a short moment !  "
 echo "========================================================"
 sudo service networking restart
-sudo ifup $(ls /sys/class/net | grep enp)
+sudo ifup $eth_interface
 sleep 5
 echo
 echo "running `dig home-assistant.io'"
