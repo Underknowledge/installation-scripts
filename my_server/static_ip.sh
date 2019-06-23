@@ -1,11 +1,20 @@
 #!/bin/bash
-eth_interface=$(ls /sys/class/net | grep enp) 
+eth_interface=$(ls /sys/class/net | grep enp)
+address=$"10.0.0.27"
+netmask=$"255.255.255.0"
+gateway=$"10.0.0.1"
 echo "========================================================"
-echo "    This short script will set the network interface from DHCP to static "
+echo "    This short script will set the network interface  "
+echo "    $eth_interface  from DHCP to static "
 echo
-echo "https://wiki.debian.org/NetworkConfiguration" 
+echo "the current settings are:"
+echo "address: $address "
+echo "netmask: $netmask"
+echo "gateway: $gateway"
 echo
-echo "of cause I find an easy to follow writeup when I`m finished..." 
+echo "https://wiki.debian.org/NetworkConfiguration"
+echo
+echo "of cause I find an easy to follow writeup when I'm finished..."
 echo "https://medium.com/@cpt_midnight/static-ip-in-debian-9-stretch-acb4e5cb7dc1 "
 echo
 echo "you can get your original configuation with: "
@@ -19,10 +28,10 @@ if [ "$REPLY" != "yes" ]; then
    exit
 fi
 sudo cp /etc/network/interfaces /etc/network/interfaces_backup
-sudo sed -i "s=iface $(ls /sys/class/net | grep enp) inet dhcp=iface $(ls /sys/class/net | grep enp) inet static=g" /etc/network/interfaces
-sudo sed -i "/iface $(ls /sys/class/net | grep enp) inet static/ a \ \ \ \ \ \ \ \ gateway 10.0.0.1" /etc/network/interfaces
-sudo sed -i "/iface $(ls /sys/class/net | grep enp) inet static/ a \ \ \ \ \ \ \ \ netmask 255.255.255.0" /etc/network/interfaces
-sudo sed -i "/iface $(ls /sys/class/net | grep enp) inet static/ a \ \ \ \ \ \ \ \ address 10.0.0.27" /etc/network/interfaces
+sudo sed -i "s=iface $eth_interface inet dhcp=iface $(ls /sys/class/net | grep enp) inet static=g" /etc/network/interfaces
+sudo sed -i "/iface $eth_interface inet static/ a \ \ \ \ \ \ \ \ gateway $gateway" /etc/network/interfaces
+sudo sed -i "/iface $eth_interface inet static/ a \ \ \ \ \ \ \ \ netmask $netmask" /etc/network/interfaces
+sudo sed -i "/iface $eth_interface inet static/ a \ \ \ \ \ \ \ \ address $address" /etc/network/interfaces
 sudo sed -i "/gateway 10.0.0.1/ a #DNS configurations - only If resolvconf is installed" /etc/network/interfaces
 sudo sed -i "/#DNS configurations - only If resolvconf is installed/ a # check with 'dpkg -l | grep resolvconf' " /etc/network/interfaces
 sudo sed -i "/# check with 'dpkg -l | grep resolvconf'/ a # Otherwise edit the file:'/etc/resolv.conf' " /etc/network/interfaces
