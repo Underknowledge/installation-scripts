@@ -4,11 +4,15 @@ ipadress=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9
 echo 
 echo 
 echo "========================================================"
-echo "This short script will install a flic deamon on a Raspberry Pi "
+echo "This short script will install a flic systemd deamon on a Raspberry Pi "
 echo "https://github.com/50ButtonsEach/fliclib-linux-hci" 
 echo ""
 echo "========================================================"
 echo 
+case $(ps -p 1 -o comm=) in
+    systemd)  echo "systemd check passed" && echo && echo  ;;
+    *) echo "systemd check failed" && echo "sorry.. This script is intended for distros running systemd" && echo && exit 1 ;;
+esac
 echo 
 read -n 1 -s -r -p "Press any key to continue"
 echo 
@@ -48,7 +52,7 @@ echo "========================================================"
 echo
 echo
 echo "to pair a button just press it for +7 secconds" 
-echo "when you facing issues pairing run 'resetflicdaemon' it will delete the database and reboot the pi"
+echo "when you facing issues pairing, run 'resetflicdaemon' it will delete the database and reboot the pi"
 echo
 read -n 1 -s -r -p "Press any key to continue"
 echo 
