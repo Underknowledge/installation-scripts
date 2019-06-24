@@ -41,9 +41,10 @@ echo "setting up crontab"
 (sudo crontab -u root -l; echo "@reboot systemctl stop bluetooth" ) | sudo crontab -u root -
 echo "creating resetflicdaemon alias"
 sed -i "/ls -CF/ a alias resetflicdaemon='sudo systemctl stop flicd.service && sudo rm /var/flic.db && sudo reboot'" ~/.bashrc 
-echo
-echo
-echo "you can add the following 3 lines to your Home Assistant config to use this pi as flic server
+echo "
+
+
+you can add the following 3 lines to your Home Assistant config to use this pi as flic server
 ========================================================
 binary_sensor:
   - platform: flic
