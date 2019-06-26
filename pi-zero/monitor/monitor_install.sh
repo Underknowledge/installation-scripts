@@ -56,11 +56,14 @@ then
 else
         echo "The Monitor directory was'nt found! Starting to download"
         echo "# get mosquitto repo key"
+        echo
         wget http://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
         echo "#add repo"
+        echo
         sudo apt-key add mosquitto-repo.gpg.key
         rm mosquitto-repo.gpg.key
         echo "#download appropriate lists file"
+        echo
         sudo wget -O /etc/apt/sources.list.d//mosquitto-$(lsb_release -cs).list https://repo.mosquitto.org/debian/mosquitto-$(lsb_release -cs).list
         echo "#update caches and install"
         apt-cache search mosquitto
