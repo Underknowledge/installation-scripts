@@ -1,5 +1,11 @@
 #!/bin/bash
 DIR="/home/pi/monitor"
+mqtt_address="IP"
+mqtt_user="monitor"
+mqtt_password="PASS"
+mqtt_publisher_identity="'monitor1'"
+mqtt_port="'1883'"
+mqtt_version="'mqttv311'"
 echo "
 ========================================================
 
@@ -11,15 +17,15 @@ This installs Mosquitto, git, and andrewjfreyer's Monitor without much cmd+c/v
 
 sleep 1
 
-if [ -d "$DIR" ]
+if [ -d "/home/pi/monitor" ]
 then
-        echo "$DIR directory  exists!"
+        echo "The Monitor directory  exists already "
         echo
         echo " adding flags
 
              -b for BLE beacons
              -x for retained MQTT messages
-             
+
              "
         sleep 3
         sudo sed -i "/monitor.sh\ \ &/c ExecStart=/bin/bash /home/pi/monitor/monitor.sh -b -x &" /etc/systemd/system/monitor.service
@@ -30,7 +36,7 @@ then
         sudo systemctl restart monitor.service
         echo "Monitor restarted"
 else
-        echo "$DIR directory not found! Starting to download"
+        echo "The Monitor directory was'nt found! Starting to download"
         echo "# get mosquitto repo key"
         wget http://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
         echo "#add repo"
@@ -45,12 +51,19 @@ else
         cd ~
         echo "#clone andrewjfreyer's repo"
         git clone git://github.com/andrewjfreyer/monitor
-        echo "#enter `monitor` directory"
-        cd monitor/
+        sudo sed -i "/mqtt_address=/c mqtt_address=$mqtt_address" /home/pi/monitor/mqtt_preferences
+        sudo sed -i "/mqtt_user=/c mqtt_user=$mqtt_user" /home/pi/monitor/mqtt_preferences
+        sudo sed -i "/mqtt_password=/c mqtt_password=$mqtt_password" /home/pi/monitor/mqtt_preferences
+        sudo sed -i "/mqtt_publisher_identity=/c mqtt_publisher_identity=$mqtt_publisher_identity" /home/pi/monitor/mqtt_preferences
+        sudo sed -i "/mqtt_port=/c mqtt_port=$mqtt_port" /home/pi/monitor/mqtt_preferences
+        sudo sed -i "/mqtt_version=/c mqtt_version=$mqtt_version" /home/pi/monitor/mqtt_preferences
+########
+        sed "/# ---------------------------/ a 00:00:00:00:00:10 Bluetooth_beacon" /home/pi/monitor/known_beacon_addresses
+########
+        sed "/# ---------------------------/ a 00:00:00:00:00:10 Bluetooth_static" /home/pi/monitor/known_static_addresses
         echo "
-
         Monitor will start up now and set up the service file
-
+        install the service and cmd+c out of it and run this script again 
         "
         sleep 3
         sudo bash /home/pi/monitor/monitor.sh
