@@ -18,17 +18,13 @@ then
         echo " adding flags
 
              -b for BLE beacons
-             -x for retained messages
+             -x for retained MQTT messages
+             
              "
         sleep 3
-        sudo nano /etc/systemd/system/monitor.service
-
-
-# ExecStart=/bin/bash /home/pi/monitor/monitor.sh  &
-# to
-# ExecStart=/bin/bash /home/pi/monitor/monitor.sh -b -x &
-
-
+        sudo sed -i "/monitor.sh\ \ &/c ExecStart=/bin/bash /home/pi/monitor/monitor.sh -b -x &" /etc/systemd/system/monitor.service
+        cat /etc/systemd/system/monitor.service
+        sleep 3
         sudo systemctl daemon-reload
         echo "Daemon reloaded"
         sudo systemctl restart monitor.service
