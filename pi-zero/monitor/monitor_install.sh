@@ -1,36 +1,37 @@
 #!/bin/bash
 DIR="/home/pi/monitor"
-echo " 
+echo "
 ========================================================
 
-This installs Mosquitto, git, and andrewjfreyer's Monitor without much cmd+c/v 
+This installs Mosquitto, git, and andrewjfreyer's Monitor without much cmd+c/v
 
 
 ========================================================"
 
 
 sleep 1
- 
+
 if [ -d "$DIR" ]
 then
         echo "$DIR directory  exists!"
         echo
         echo " adding flags
-             
+
              -b for BLE beacons
-             -x for retained messages 
+             -x for retained messages
              "
         sleep 3
         sudo nano /etc/systemd/system/monitor.service
-        
+
+
 # ExecStart=/bin/bash /home/pi/monitor/monitor.sh  &
-# to 
+# to
 # ExecStart=/bin/bash /home/pi/monitor/monitor.sh -b -x &
 
 
         sudo systemctl daemon-reload
-        echo "Daemon reloaded" 
-        sudo systemctl restart monitor.service 
+        echo "Daemon reloaded"
+        sudo systemctl restart monitor.service
         echo "Monitor restarted"
 else
         echo "$DIR directory not found! Starting to download"
@@ -50,9 +51,9 @@ else
         git clone git://github.com/andrewjfreyer/monitor
         echo "#enter `monitor` directory"
         cd monitor/
-        echo " 
+        echo "
 
-        Monitor will start up now and set up the service file 
+        Monitor will start up now and set up the service file
 
         "
         sleep 3
