@@ -25,8 +25,23 @@ case $(uname -m) in
     *) echo "Sorry, I can not get a $(uname -m) flic binary for you :(" && exit 1 ;;
 esac
 chmod a+x /usr/local/bin/flicd
-echo "Downloading systemd file and make it executable"
-curl https://raw.githubusercontent.com/Underknowledge/installation-scripts/pi-zero/flicd/flicd.service > /etc/systemd/system/flicd.service
+echo "Creating systemd file and make it executable"
+# curl https://raw.githubusercontent.com/Underknowledge/installation-scripts/pi-zero/flicd/flicd.service > /etc/systemd/system/flicd.service
+cat << EOF > /etc/systemd/system/flicd.service
+[Unit]
+Description=Flic Buttons Service
+After=bluetooth.service
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/flicd -w -s 0.0.0.0 -p 5551 -l /var/log/flic_log -f /tmp/flic.db
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
 chmod a+x /etc/systemd/system/flicd.service
 echo "Disableing Bluetooth" 
 sudo systemctl stop bluetooth
@@ -40,7 +55,7 @@ echo "creating the dir
 echo "setting up crontab" 
 (sudo crontab -u root -l; echo "@reboot systemctl stop bluetooth" ) | sudo crontab -u root -
 echo "creating resetflicdaemon alias"
-sed -i "/ls -CF/ a alias resetflicdaemon='sudo systemctl stop flicd.service && sudo rm /var/flic.db && sudo reboot'" ~/.bashrc 
+sed -i "/ls -CF/ a alias resetflicdaemon='sudo systemctl stop flicd.service && sudo rm /tmp/flic.db && sudo reboot'" ~/.bashrc 
 echo "
 
 
@@ -53,7 +68,8 @@ binary_sensor:
 
 
 to pair a button just press it for +7 secconds
-when you facing issues pairing, run 'resetflicdaemon' it will delete the database and reboot the pi"
+when you facing issues pairing, reboot the pi.
+it will delete the database in /tmp and you can pair the buttun again "
 echo
 read -n 1 -s -r -p "Press any key to continue"
 echo 
