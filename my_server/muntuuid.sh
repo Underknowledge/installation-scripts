@@ -20,5 +20,9 @@ trying to mount to ${path}
 
  "
     sudo mount $(blkid -U "${uuid}") "${path}"
+    
+# do stuff here 
+
+
     exit 0
 fi
