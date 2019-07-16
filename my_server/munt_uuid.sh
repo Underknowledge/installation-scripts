@@ -20,8 +20,10 @@ trying to mount to ${path}
 
  "
     sudo mount $(blkid -U "${uuid}") "${path}"
-    
-# do stuff here 
+
+# do stuff here like
+#    sudo mv -v ${path}/Folder/ /share/HDD/xyz
+
 
 
     exit 0
