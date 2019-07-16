@@ -23,6 +23,8 @@ trying to mount to ${path}
 
 # do stuff here like
 #    sudo mv -v ${path}/Folder/ /share/HDD/xyz
+# or rsync -az --delete /mnt/data/ /media/current_working_data/;
+# or /usr/bin/rsync -a --delete -q /mnt/ha-config/ /ab/cd/$(date +"%A" -d "-1 day")/
 
 
 
