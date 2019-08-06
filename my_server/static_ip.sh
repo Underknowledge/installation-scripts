@@ -1,7 +1,7 @@
 #!/bin/bash
 eth_interface=$(ls /sys/class/net | grep enp)
 address=$"10.0.0.27"
-netmask=$"255.255.255.0"
+netmask=$"255.255.252.0"
 gateway=$"10.0.0.1"
 echo "========================================================"
 echo "    This short script will set the network interface  "
