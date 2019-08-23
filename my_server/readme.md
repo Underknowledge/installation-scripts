@@ -15,7 +15,9 @@ attach to this new one:
     
 or with name:
     tmux new -s docker
+    
     tmux a -t docker
+    
     tmux kill-session -t docker
     
     
