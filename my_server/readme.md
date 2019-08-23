@@ -26,10 +26,6 @@ list:
 
     tmux ls
 
-kill session:
-
-    tmux kill-session -t myname
-
 hit `ctrl+b` and then:
 
 ## Sessions
