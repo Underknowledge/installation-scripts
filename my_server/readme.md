@@ -1,11 +1,6 @@
 
 
 
-` /bin/bash^M: bad interpreter:` 
-
-` $ sed -i -e 's/^M$//' script.sh ` 
-
-
 
 # tmux 
 
@@ -64,3 +59,11 @@ hit `ctrl+b` and then:
     d  detach
     ?  list shortcuts
     t  big clock
+
+
+
+
+
+` /bin/bash^M: bad interpreter:` 
+
+` $ sed -i -e 's/^M$//' script.sh ` 
