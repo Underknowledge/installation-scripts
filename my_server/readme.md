@@ -14,6 +14,7 @@ attach to this new one:
     tmux a -t 0
     
 or with name:
+
     tmux new -s docker
     
     tmux a -t docker
