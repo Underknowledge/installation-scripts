@@ -4,7 +4,7 @@
 
 # tmux 
 
-Just a newsession:
+Just a new session:
 
     tmux
     
