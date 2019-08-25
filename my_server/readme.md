@@ -64,10 +64,11 @@ hit `ctrl+b` and then:
 # Docker/-Compose https://docs.docker.com/compose/
 
 ##running containers -a for stopped
+
     docker ps
 
-
 ##resource usage 
+
     docker stats
 
 ## kill all running containers
