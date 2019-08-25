@@ -1,7 +1,7 @@
 #!/bin/bash 
 if (( $# == 0 )); then
     echo "No parameters provided you need to define an user and a group"
-    exit1
+    exit 1
 else
     echo "you will add an user named $1 and add them to the group $2"
     echo " to add a group run 'sudo groupadd -g <GID you like> <group>' "
