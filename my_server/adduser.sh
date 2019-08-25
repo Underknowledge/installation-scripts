@@ -19,4 +19,7 @@ echo " at the moment the users
 echo " $(sudo awk -F':' '$2 ~ "\$" {print $1}' /etc/shadow) "
 echo "are able to login "
 echo
-echo " $(id $1)
+echo " $(id $1)"
+echo
+echo " after this script is thourght for the usage with docker containers run for example:
+sudo chown -R $1:$2 $pwd "
