@@ -70,6 +70,10 @@ hit `ctrl+b` and then:
 ## resource usage 
 
     docker stats
+    
+### network check
+
+    docker network inspect <network>
 
 ## kill all running containers
     docker kill $(docker ps -q)
