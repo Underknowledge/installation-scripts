@@ -36,6 +36,8 @@ hit `ctrl+b` and then:
 ## Tabs
 
     c           new
+    p           previous 
+    n           next
     ,           name
     w           list
     f           find
