@@ -63,11 +63,11 @@ hit `ctrl+b` and then:
 
 # Docker/-Compose https://docs.docker.com/compose/
 
-##running containers -a for stopped
+## running containers -a for stopped
 
     docker ps
 
-##resource usage 
+## resource usage 
 
     docker stats
 
