@@ -1,7 +1,7 @@
 
 # curl to download 
 
-    sudo curl <URL> -o <filname>
+    sudo curl <URL> -o <filename>
 
 # tmux 
 
