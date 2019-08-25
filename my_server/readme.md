@@ -61,8 +61,37 @@ hit `ctrl+b` and then:
 
 
 
+# Docker/-Compose https://docs.docker.com/compose/
+
+##running containers -a for stopped
+    docker ps
 
 
-` /bin/bash^M: bad interpreter:` 
+##resource usage 
+    docker stats
 
-` $ sed -i -e 's/^M$//' script.sh ` 
+## kill all running containers
+    docker kill $(docker ps -q)
+
+## remove old containers
+    docker ps -a | grep 'weeks ago' | awk '{print $1}' | xargs docker rm
+
+## remove stopped containers
+    docker rm -v $(docker ps -a -q -f status=exited)
+
+## bashrc
+
+    alias dockeryaml='sudo nano /opt/docker-compose.yml'
+    alias dcp='docker-compose -f /opt/docker-compose.yml '
+    alias dcpup='docker-compose -f /opt/docker-compose.yml --compatibility up -d'
+    alias dcpull='docker-compose -f /opt/docker-compose.yml pull --parallel'
+    alias dclogs='docker-compose -f /opt/docker-compose.yml logs -tf --tail="50" '
+    alias dtail='docker logs -tf --tail="50" "$@"'
+    
+
+
+# Misc
+
+    ` /bin/bash^M: bad interpreter:` 
+
+    ` $ sed -i -e 's/^M$//' script.sh ` 
