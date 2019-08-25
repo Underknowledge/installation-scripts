@@ -63,11 +63,11 @@ hit `ctrl+b` and then:
 
 # Docker/-Compose https://docs.docker.com/compose/
 
-## running containers -a for stopped
+#### running containers -a for stopped
 
     docker ps
 
-## resource usage 
+### resource usage 
 
     docker stats
     
@@ -75,16 +75,16 @@ hit `ctrl+b` and then:
 
     docker network inspect <network>
 
-## kill all running containers
+### kill all running containers
     docker kill $(docker ps -q)
 
-## remove old containers
+### remove old containers
     docker ps -a | grep 'weeks ago' | awk '{print $1}' | xargs docker rm
 
-## remove stopped containers
+### remove stopped containers
     docker rm -v $(docker ps -a -q -f status=exited)
 
-## bashrc
+### bashrc
 
     alias dockeryaml='sudo nano /opt/docker-compose.yml'
     alias dcp='docker-compose -f /opt/docker-compose.yml '
