@@ -37,7 +37,7 @@ sudo sed -i 's/#PubkeyAuthentication\ yes/PubkeyAuthentication\ yes/g' /etc/ssh/
 echo " uncomment PubkeyAuthentication "
 echo
 sudo sed -i 's/#MaxAuthTries.*/MaxAuthTries 3/g' /etc/ssh/sshd_config 
-echo " MaxAuthTries 3 "
+echo " MaxAuthTries 7 "
 echo
 sudo sed -i 's/#AuthorizedKeysFile/AuthorizedKeysFile/g' /etc/ssh/sshd_config 
 echo " uncomment AuthorizedKeysFile "
