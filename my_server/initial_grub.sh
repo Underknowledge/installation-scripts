@@ -80,7 +80,7 @@ This will update the boot loader settings we just changed and make them stick. T
 case "$1" in 
     alienware) alienware ;;
     macbook)   A1286 ;;
-    *) echo "usage: $0 mount|unmount|create|fill" >&2
+    *) echo "usage: $0 alienware|macbook" >&2
        exit 1
        ;;
 esac
