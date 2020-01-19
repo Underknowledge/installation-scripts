@@ -1,5 +1,5 @@
 #!/bin/bash
-ipadress=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
+ipadress=$(ip a | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p' | head -1)
 echo "========================================================"
 echo " This short script will disable password Authentication in the favour of keys  "
 echo " when you dont have ssh-keys yet, I liked this article:"
