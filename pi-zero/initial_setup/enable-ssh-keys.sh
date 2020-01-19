@@ -18,9 +18,27 @@ echo "type yes to move on "
 read  
 if [ "$REPLY" != "yes" ]; then
    exit
-fi  
+fi
+if [[ -e "/etc/ssh/sshd_config_backup" ]]
+then
+    sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup_2
+else
+    sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config_backup
+fi
+
+if [ -r ~/.ssh/authorized_keys ];
+then
+    echo "~/.ssh/authorized_keys exists and is readable"
+else
+    echo "~/.ssh/authorized_keys is not readable"
+    sleep 2 
+    echo lets try to chown ~/.ssh/authorized_keys - its meight be not here...
+    sudo chown $USER:$USER ~/.ssh/authorized_keys
+    exit 401
+fi
 echo   
 echo " sorry that I'm aggravating, are you shure that you installed the key? "
+echo " is it READABLE from the user you log in?" 
 echo " type yes once more to move on "
 read  
 if [ "$REPLY" != "yes" ]; then
