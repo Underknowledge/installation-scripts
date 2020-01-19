@@ -1,8 +1,15 @@
 #!/bin/bash
-eth_interface=$(ls /sys/class/net | grep enp)
-address=$"10.0.0.27"
+eth_interface=$(ls /sys/class/net | grep enp| head -1)
+address=$"10.0.0.28"
 netmask=$"255.255.252.0"
 gateway=$"10.0.0.1"
+if grep -qF "Otherwise edit the file:" /etc/network/interfaces
+then
+  echo "running this again is dangerus!, goodbye"
+  echo 
+  echo "cfg file youre looking for: /etc/network/interfaces" 
+  exit 0
+fi
 echo "========================================================"
 echo "    This short script will set the network interface  "
 echo "    $eth_interface  from DHCP to static "
@@ -12,6 +19,7 @@ echo "address: $address "
 echo "netmask: $netmask"
 echo "gateway: $gateway"
 echo
+echo "it will also install the dnsutils package to check the network configuration"  
 echo "https://wiki.debian.org/NetworkConfiguration"
 echo
 echo "of cause I find an easy to follow writeup when I'm finished..."
@@ -27,11 +35,12 @@ read
 if [ "$REPLY" != "yes" ]; then
    exit
 fi
+sudo apt install dnsutils -y
 sudo cp /etc/network/interfaces /etc/network/interfaces_backup
-sudo sed -i "s=iface $eth_interface inet dhcp=iface $(ls /sys/class/net | grep enp) inet static=g" /etc/network/interfaces
-sudo sed -i "/iface $eth_interface inet static/ a \ \ \ \ \ \ \ \ gateway $gateway" /etc/network/interfaces
-sudo sed -i "/iface $eth_interface inet static/ a \ \ \ \ \ \ \ \ netmask $netmask" /etc/network/interfaces
-sudo sed -i "/iface $eth_interface inet static/ a \ \ \ \ \ \ \ \ address $address" /etc/network/interfaces
+sudo sed -i "s=iface $eth_interface inet dhcp=iface $(ls /sys/class/net | grep enp) inet static=g" /etc/network/interfaces | exit 0
+sudo sed -i "/iface $eth_interface inet static/ a \ \ \ \ \ \ \ \ gateway $gateway" /etc/network/interfaces || exit 0
+sudo sed -i "/iface $eth_interface inet static/ a \ \ \ \ \ \ \ \ netmask $netmask" /etc/network/interfaces || exit 0
+sudo sed -i "/iface $eth_interface inet static/ a \ \ \ \ \ \ \ \ address $address" /etc/network/interfaces || exit 0
 sudo sed -i "/gateway 10.0.0.1/ a #DNS configurations - only If resolvconf is installed" /etc/network/interfaces
 sudo sed -i "/#DNS configurations - only If resolvconf is installed/ a # check with 'dpkg -l | grep resolvconf' " /etc/network/interfaces
 sudo sed -i "/# check with 'dpkg -l | grep resolvconf'/ a # Otherwise edit the file:'/etc/resolv.conf' " /etc/network/interfaces
