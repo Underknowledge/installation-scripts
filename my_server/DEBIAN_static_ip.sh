@@ -47,7 +47,27 @@ sudo sed -i "/iface $eth_interface inet static/ a \ \ \ \ \ \ \ \ address $addre
 sudo sed -i "/gateway $gateway/ a #DNS configurations - only If resolvconf is installed" $cfg
 sudo sed -i "/#DNS configurations - only If resolvconf is installed/ a # check with 'dpkg -l | grep resolvconf' " $cfg
 sudo sed -i "/# check with 'dpkg -l | grep resolvconf'/ a # Otherwise edit the file:'/etc/resolv.conf' #dns-nameservers 1.1.1.1 " $cfg
-
+echo "========================================================"
+echo "  all done ! check if this is a sane config for you     "
+echo "========================================================"
+sleep 1
+cat $cfg
+sleep 2
+  read -r -p "all alright? [Y/n] " input
+    case $input in
+        [yY][eE][sS]|[yY])
+    		echo "Yes"
+    		;;
+        [nN][oO]|[nN])
+    		echo "No, Ok! lets restore the backup"
+            sudo cp /etc/network/interfaces_backup /etc/network/interfaces
+            exit 1
+           		;;
+        *)
+    	echo "Invalid input..."
+    	exit 1
+    	;;
+    esac
 echo "========================================================"
 echo "        we will be back in a short moment !  "
 echo "========================================================"
