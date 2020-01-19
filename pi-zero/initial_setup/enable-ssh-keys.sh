@@ -10,7 +10,7 @@ echo
 echo " You can copy your key over with "
 echo   
 echo  
-echo "\$ ssh-copy-id -i ~/.ssh/file.key.pub pi@${ipadress} "
+echo "\$ ssh-copy-id -i ~/.ssh/id_rsa.pub $USER@${ipadress} "
 echo "        (high Chances that you named your file diffrently) " 
 echo "========================================================"
 echo   
