@@ -45,7 +45,7 @@ randcolor = ('%02X%02X%02X' % (rand(),rand(),rand()))
 
 
 
-comands = ["cat /proc/loadavg", "w", "df -H | grep -v 'Filesystem\|tmpfs\|cdrom\|loop\|overlay'","docker ps" , "crontab -l", " dmesg -T | grep -i 'error\|warn'", "systemctl | grep -i error", "ip a", "ss -tlnp", "curl ifconfig.co/json" ]
+comands = ["uptime", "w", "df -H | grep -v 'Filesystem\|tmpfs\|cdrom\|loop\|overlay'","docker ps" , "crontab -l", " dmesg -T | grep -i 'error\|warn'", "systemctl | grep -i error", "ip a", "ss -tlnp", "curl ifconfig.co/json" ]
 
 for cmd in comands:
   out = (os.popen(cmd).read())
