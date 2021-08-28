@@ -1,20 +1,25 @@
 #!/usr/bin/env python3
 
 from discord_webhook import DiscordWebhook, DiscordEmbed
-# pip install discord-webhook
+# pip install discord-webhook python-dotenv
 # https://github.com/lovvskillz/python-discord-webhook
 # python3 /opt/discord-monitoring.py
 
-from discordsecrets import *
-# /opt/discordsecrets.py:
+from dotenv import load_dotenv
+load_dotenv()
+# /opt/.env:
 # pull in the vars:
-#   webhook_url
-#   icon 
+#   webhook_url = ""
+#   icon = ""
 
 import time
 import os
 hostname = os.uname()[1]
 username = os.environ.get('USER')
+webhook_url = os.getenv('webhook_url')
+icon = os.getenv('icon')
+# change to use the variables right away
+
 if username == None:
   username = "unknown" 
 
