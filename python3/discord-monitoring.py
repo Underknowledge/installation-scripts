@@ -1,5 +1,19 @@
 #!/usr/bin/env python3
 
+# update
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--pull", help="Update the script via github",
+                    action="store_true")
+args = parser.parse_args()
+if args.pull:
+  print("Downloading newer version")
+  import requests
+  url = 'https://raw.githubusercontent.com/Underknowledge/installation-scripts/master/python3/discord-monitoring.py'
+  update = requests.get(url)
+  open('/opt/discord-monitoring.py', 'wb').write(update.content)
+  exit()
+
 from discord_webhook import DiscordWebhook, DiscordEmbed
 # pip install discord-webhook python-dotenv
 # https://github.com/lovvskillz/python-discord-webhook
@@ -16,31 +30,20 @@ import time
 import os
 hostname = os.uname()[1]
 username = os.environ.get('USER')
+if username == None:
+  username = "unknown" 
 webhook_url = os.getenv('webhook_url')
 icon = os.getenv('icon')
 # change to use the variables right away
 
-if username == None:
-  username = "unknown" 
 
+# the bot can have colorful mesages. set here a random HEX color
 import random
 rand = lambda: random.randint(0,255)
 randcolor = ('%02X%02X%02X' % (rand(),rand(),rand()))
 
 
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument("--pull", help="Update the script via github",
-                    action="store_true")
-args = parser.parse_args()
-if args.pull:
-    print("Downloading newer version")
-    import requests
-    url = 'https://raw.githubusercontent.com/Underknowledge/installation-scripts/master/python3/discord-monitoring.py'
-    update = requests.get(url)
-    open('/opt/discord-monitoring.py', 'wb').write(update.content)
-    print(webhook_url)
-    exit()
+
 
 comands = ["cat /proc/loadavg", "w", "df -H | grep -v 'Filesystem\|tmpfs\|cdrom\|loop\|overlay'","docker ps" , "crontab -l", " dmesg -T | grep -i 'error\|warn'", "systemctl | grep -i error", "ip a", "ss -tlnp", "curl ifconfig.co/json" ]
 
