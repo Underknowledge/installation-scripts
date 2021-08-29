@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# pip install discord-webhook python-dotenv
+# https://github.com/lovvskillz/python-discord-webhook
+# python3 /opt/discord-monitoring.py
+
 # update
 import argparse
 parser = argparse.ArgumentParser()
@@ -9,15 +13,23 @@ args = parser.parse_args()
 if args.pull:
   print("Downloading newer version")
   import requests
+  import json
+  url = 'https://api.github.com/repos/Underknowledge/installation-scripts/commits'
+  params = ( ('path/python3/discord-monitoring.py', ''),  )
+  r = requests.get(url, params=params )
+  loadedjson = r.json()
+  def get_commit_date(github_commit_dict):
+      return github_commit_dict["commit"]["committer"]["date"]
+  latest = max(loadedjson, key=get_commit_date)
+  print(latest["commit"]["committer"]["date"])
+  print(latest["commit"]["message"])
   url = 'https://raw.githubusercontent.com/Underknowledge/installation-scripts/master/python3/discord-monitoring.py'
   update = requests.get(url)
   open('/opt/discord-monitoring.py', 'wb').write(update.content)
   exit()
 
 from discord_webhook import DiscordWebhook, DiscordEmbed
-# pip install discord-webhook python-dotenv
-# https://github.com/lovvskillz/python-discord-webhook
-# python3 /opt/discord-monitoring.py
+
 
 from dotenv import load_dotenv
 load_dotenv()
