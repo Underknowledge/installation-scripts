@@ -103,14 +103,15 @@ servicepath = "/etc/systemd/system/discord-monitoring.service"
 servicefile = """
 [Unit]
 Description=Python Discord Service
+Wants=network-online.target
+After=network-online.target
 [Service]
 ExecStart=/usr/bin/python3 /opt/discord-monitoring.py
 WorkingDirectory=/opt
 Environment=PYTHONUNBUFFERED=1
 Type=oneshot
 [Install]
-Wants=network-online.target
-After=network-online.target
+WantedBy=multi-user.target
 """
 
 timerpath = "/etc/systemd/system/discord-monitoring.timer"
