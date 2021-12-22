@@ -109,7 +109,8 @@ WorkingDirectory=/opt
 Environment=PYTHONUNBUFFERED=1
 Type=oneshot
 [Install]
-WantedBy=default.target
+Wants=network-online.target
+After=network-online.target
 """
 
 timerpath = "/etc/systemd/system/discord-monitoring.timer"
