@@ -4,12 +4,98 @@
 # https://github.com/lovvskillz/python-discord-webhook
 # python3 /opt/discord-monitoring.py
 
-# update
-import argparse
+comands = [ "w", "free -h", "timeout 5 df -H | grep -v 'Filesystem\|tmpfs\|cdrom\|loop\|overlay'", "curl ifconfig.co/json", " dmesg -T | grep -i 'error\|warn'", "systemctl | grep -i error", "docker ps", "hostname -I"]
+
+
+
+from pathlib import Path
+import subprocess
+import sys
+import pip
+import time
+import os
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+try:
+  import argparse
+except ModuleNotFoundError:
+  print("Module 'argparse' not installed. Installing...")
+  install("argparse")
+  print("Module 'argparse' installed.")
+try:
+  from environs import Env
+except ModuleNotFoundError:
+  print("Module 'environs' not installed. Installing...")
+  install("environs")
+  print("Module 'environs' installed.")
+try:
+  from discord_webhook import DiscordWebhook, DiscordEmbed
+except ModuleNotFoundError:
+  print("Module 'environs' not installed. Installing...")
+  install("discord-webhook")
+  print("Module 'discord-webhook' installed.")
+
+
+env = Env()
+dotwebhook_file = '.webhook'
+if not Path(dotwebhook_file).exists():
+    webhook_url = input("Enter your Discord webhook: \n")
+    file_name = dotwebhook_file
+    icon = "https://cdn.discordapp.com/attachments/879486731454406728/923670082377355304/unknown.png"
+    custom_icon = input("enter the URL of your Custom Icon. leave empty to use fallback: \n")
+    if custom_icon != "":
+      icon = custom_icon
+    dotwebhook = (f"webhook_url = \"{ webhook_url }\" \nicon = \"{ icon }\"")
+    f = open(file_name, 'a+')
+    f.write(dotwebhook)
+    f.close()
+env.read_env(dotwebhook_file)
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--pull", help="Update the script via github",
-                    action="store_true")
+                    action="store_true"
+                    )
+parser.add_argument('--cmd', '--arbitrary', help="Run additionaly a command like 'ls - lah' ",
+                    action='append', default=[], dest='cmd_line_arg', nargs='+', type=str
+                    )
+parser.add_argument('--systemd', help="define a systemd service to check", 
+                    action='append', default=[], dest='systemd', nargs='+', type=str.lower
+                    )
+parser.add_argument('--clean', help="empty the default commands, best used with --cmd/--arbitrary",
+                    action='store_true', required=False
+                    )
+parser.add_argument('--stin', help="unimplemented, pipe data to script and send it over",
+                    action='store_false', required=False
+                    )
+parser.add_argument('--install', help="install a systemd service what runs every 8h",
+                    action='store_true' ,required=False
+                    )
+
+
+
+
+
+
 args = parser.parse_args()
+# digest --clean
+if args.clean:
+  comands = []
+if args.stin:
+  comands = []
+  print(sys.stdin.read())
+  
+# digest --arbitrary
+for cmd in args.cmd_line_arg:
+  comands = comands + cmd
+# digest --systemd
+for cmd in args.systemd:
+  systemd_listToStr = ' '.join([str(elem) for elem in cmd])
+  systemd_check = ("systemctl status " + systemd_listToStr + " -l" )
+  comands += [systemd_check] 
+
+# update
 if args.pull:
   print("Downloading newer version")
   import requests
@@ -28,19 +114,6 @@ if args.pull:
   open('/opt/discord-monitoring.py', 'wb').write(update.content)
   exit()
 
-from discord_webhook import DiscordWebhook, DiscordEmbed
-
-
-from dotenv import load_dotenv
-load_dotenv()
-# /opt/.env:
-# pull in the vars:
-#   webhook_url = ""
-#   icon = ""
-
-
-import time
-import os
 hostname = os.uname()[1]
 username = os.environ.get('USER')
 if username == None:
@@ -49,16 +122,10 @@ webhook_url = os.getenv('webhook_url')
 icon = os.getenv('icon')
 # change to use the variables right away
 
-
 # the bot can have colorful mesages. set here a random HEX color
 import random
 rand = lambda: random.randint(0,255)
 randcolor = ('%02X%02X%02X' % (rand(),rand(),rand()))
-
-
-
-
-comands = ["uptime", "w", "df -H | grep -v 'Filesystem\|tmpfs\|cdrom\|loop\|overlay'","docker ps" , "crontab -l", " dmesg -T | grep -i 'error\|warn'", "systemctl | grep -i error", "ip a", "ss -tlnp", "curl ifconfig.co/json" ]
 
 for cmd in comands:
   out = (os.popen(cmd).read())
@@ -74,8 +141,7 @@ for cmd in comands:
   embed.add_embed_field(name="Run from:", value=(hostname))
   embed.add_embed_field(name="User:", value=(username))
   webhook.add_embed(embed)
-  response = webhook.execute()
-
+  # send the message
   if (len(out))>1990:
     discordlimit = 1990
     chunks = [out[i:i+discordlimit] for i in range(0, len(out), discordlimit)]
@@ -95,56 +161,45 @@ for cmd in comands:
 # https://stackoverflow.com/questions/18854620/whats-the-best-way-to-split-a-string-into-fixed-length-chunks-and-work-with-the/18854817
 
 
-from pathlib import Path
-# print("File      Path:", Path(__file__).absolute())
-
-
-servicepath = "/etc/systemd/system/discord-monitoring.service"
-servicefile = """
-[Unit]
-Description=Python Discord Service
-Wants=network-online.target
-After=network-online.target
-[Service]
-ExecStart=/usr/bin/python3 /opt/discord-monitoring.py
-WorkingDirectory=/opt
-Environment=PYTHONUNBUFFERED=1
-Type=oneshot
-[Install]
-WantedBy=multi-user.target
-"""
-
-timerpath = "/etc/systemd/system/discord-monitoring.timer"
-timerfile = """
-[Unit]
-Description=run Discord Service
-[Timer]
-OnBootSec=1min
-OnUnitActiveSec=8h
-[Install]
-WantedBy=timers.target
-"""
-
-# types = ["service", "timer"]
-# for type in types:
-#   systemdservice = Path( (type) + 'path')
-#   if not systemdservice.is_file():
-#     f = open(( (type) + 'path'), "a")
-#     f.write ( (type) + 'file')
-#     f.close()
-
-systemdservice = Path(servicepath)
-if not systemdservice.is_file():
-  f = open((servicepath), "a")
-  f.write (servicefile)
-  f.close()
-systemdtimer = Path(timerpath)
-if not systemdtimer.is_file():
-  f = open((timerpath), "a")
-  f.write (timerfile)
-  f.close()
-  #os.system("systemctl --user daemon-reload; systemctl daemon-reload; systemctl start discord-monitoring.service ;systemctl  enable --now discord-monitoring.timer; systemctl status discord-monitoring.timer")
-  os.system(" systemctl daemon-reload")
-  #os.system("systemctl start discord-monitoring.service")
-  os.system("systemctl enable --now discord-monitoring.timer")
-  os.system("systemctl status discord-monitoring.timer")
+if args.install:
+  servicepath = "/etc/systemd/system/discord-monitoring.service"
+  servicefile = """
+  [Unit]
+  Description=Python Discord Service
+  Wants=network-online.target
+  After=network-online.target
+  [Service]
+  ExecStart=/usr/bin/python3 /opt/discord-monitoring.py
+  WorkingDirectory=/opt
+  Environment=PYTHONUNBUFFERED=1
+  Type=oneshot
+  [Install]
+  WantedBy=multi-user.target
+  """
+  
+  timerpath = "/etc/systemd/system/discord-monitoring.timer"
+  timerfile = """
+  [Unit]
+  Description=run Discord Service
+  [Timer]
+  OnBootSec=1min
+  OnUnitActiveSec=8h
+  [Install]
+  WantedBy=timers.target
+  """
+   
+  systemdservice = Path(servicepath)
+  if not systemdservice.is_file():
+    f = open((servicepath), "a")
+    f.write (servicefile)
+    f.close()
+  systemdtimer = Path(timerpath)
+  if not systemdtimer.is_file():
+    f = open((timerpath), "a")
+    f.write (timerfile)
+    f.close()
+    #os.system("systemctl --user daemon-reload; systemctl daemon-reload; systemctl start discord-monitoring.service ;systemctl  enable --now discord-monitoring.timer; systemctl status discord-monitoring.timer")
+    os.system(" systemctl daemon-reload")
+    #os.system("systemctl start discord-monitoring.service")
+    os.system("systemctl enable --now discord-monitoring.timer")
+    os.system("systemctl status discord-monitoring.timer")
