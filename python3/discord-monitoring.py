@@ -1,41 +1,39 @@
 #!/usr/bin/env python3
 
-# pip install discord-webhook python-dotenv
 # https://github.com/lovvskillz/python-discord-webhook
 # python3 /opt/discord-monitoring.py
 
 comands = [ "w", "free -h", "timeout 5 df -H | grep -v 'Filesystem\|tmpfs\|cdrom\|loop\|overlay'", "curl ifconfig.co/json", " dmesg -T | grep -i 'error\|warn'", "systemctl | grep -i error", "docker ps", "hostname -I"]
 
-
-
 from pathlib import Path
 import subprocess
 import sys
-import pip
 import time
 import os
 
 def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
 try:
   import argparse
 except ModuleNotFoundError:
   print("Module 'argparse' not installed. Installing...")
   install("argparse")
   print("Module 'argparse' installed.")
+  import argparse
 try:
   from environs import Env
 except ModuleNotFoundError:
   print("Module 'environs' not installed. Installing...")
   install("environs")
   print("Module 'environs' installed.")
+  from environs import Env
 try:
   from discord_webhook import DiscordWebhook, DiscordEmbed
 except ModuleNotFoundError:
   print("Module 'environs' not installed. Installing...")
   install("discord-webhook")
   print("Module 'discord-webhook' installed.")
+  from discord_webhook import DiscordWebhook, DiscordEmbed
 
 
 env = Env()
@@ -73,14 +71,11 @@ parser.add_argument('--install', help="install a systemd service what runs every
                     action='store_true' ,required=False
                     )
 
-
 args = parser.parse_args()
 # digest --clean
 if args.clean:
   comands = []
 if args.stin:
-  ospopen = args.stin
-  print(ospopen)
   comands = [ 'stin' ]
 # digest --arbitrary
 for cmd in args.cmd_line_arg:
