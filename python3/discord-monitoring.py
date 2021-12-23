@@ -67,15 +67,11 @@ parser.add_argument('--clean', help="empty the default commands, best used with 
                     action='store_true', required=False
                     )
 parser.add_argument('--stin', help="unimplemented, pipe data to script and send it over",
-                    action='store_false', required=False
+                    action='store_true', required=False
                     )
 parser.add_argument('--install', help="install a systemd service what runs every 8h",
                     action='store_true' ,required=False
                     )
-
-
-
-
 
 
 args = parser.parse_args()
@@ -83,9 +79,9 @@ args = parser.parse_args()
 if args.clean:
   comands = []
 if args.stin:
-  comands = []
-  print(sys.stdin.read())
-  
+  ospopen = args.stin
+  print(ospopen)
+  comands = [ 'stin' ]
 # digest --arbitrary
 for cmd in args.cmd_line_arg:
   comands = comands + cmd
@@ -120,7 +116,6 @@ if username == None:
   username = "unknown" 
 webhook_url = os.getenv('webhook_url')
 icon = os.getenv('icon')
-# change to use the variables right away
 
 # the bot can have colorful mesages. set here a random HEX color
 import random
@@ -128,7 +123,10 @@ rand = lambda: random.randint(0,255)
 randcolor = ('%02X%02X%02X' % (rand(),rand(),rand()))
 
 for cmd in comands:
-  out = (os.popen(cmd).read())
+  if cmd == 'stin':
+    out = (sys.stdin.read())
+  else:
+    out = (os.popen(cmd).read())  
   webhook = DiscordWebhook(url=(webhook_url), rate_limit_retry=True )
   embed = DiscordEmbed(
       title="Comand: ", description=(cmd), color=(randcolor)
@@ -198,8 +196,7 @@ if args.install:
     f = open((timerpath), "a")
     f.write (timerfile)
     f.close()
-    #os.system("systemctl --user daemon-reload; systemctl daemon-reload; systemctl start discord-monitoring.service ;systemctl  enable --now discord-monitoring.timer; systemctl status discord-monitoring.timer")
     os.system(" systemctl daemon-reload")
-    #os.system("systemctl start discord-monitoring.service")
     os.system("systemctl enable --now discord-monitoring.timer")
+    os.system("systemctl enable --now discord-monitoring.service")
     os.system("systemctl status discord-monitoring.timer")
