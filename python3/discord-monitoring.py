@@ -35,40 +35,27 @@ except ModuleNotFoundError:
   print("Module 'discord-webhook' installed.")
   from discord_webhook import DiscordWebhook, DiscordEmbed
 
-
-env = Env()
-dotwebhook_file = '.webhook'
-if not Path(dotwebhook_file).exists():
-    webhook_url = input("Enter your Discord webhook: \n")
-    file_name = dotwebhook_file
-    icon = "https://cdn.discordapp.com/attachments/879486731454406728/923670082377355304/unknown.png"
-    custom_icon = input("enter the URL of your Custom Icon. leave empty to use fallback: \n")
-    if custom_icon != "":
-      icon = custom_icon
-    dotwebhook = (f"webhook_url = \"{ webhook_url }\" \nicon = \"{ icon }\"")
-    f = open(file_name, 'a+')
-    f.write(dotwebhook)
-    f.close()
-env.read_env(dotwebhook_file)
-
 parser = argparse.ArgumentParser()
-parser.add_argument("--pull", help="Update the script via github",
-                    action="store_true"
+parser.add_argument('--pull', help='Update the script via github',
+                    action='store_true'
                     )
-parser.add_argument('--cmd', '--arbitrary', help="Run additionaly a command like 'ls - lah' ",
+parser.add_argument('--cmd', '--arbitrary', help='Run additionaly a command like \'ls - lah\'',
                     action='append', default=[], dest='cmd_line_arg', nargs='+', type=str
                     )
-parser.add_argument('--systemd', help="define a systemd service to check", 
+parser.add_argument('--systemd', help='define a systemd service to check', 
                     action='append', default=[], dest='systemd', nargs='+', type=str.lower
                     )
-parser.add_argument('--clean', help="empty the default commands, best used with --cmd/--arbitrary",
+parser.add_argument('--clean', help='empty the default commands, best used with --cmd/--arbitrary',
                     action='store_true', required=False
                     )
-parser.add_argument('--stin', help="unimplemented, pipe data to script and send it over",
+parser.add_argument('--stin', help='Use it in a pipe to send it to discord',
                     action='store_true', required=False
                     )
-parser.add_argument('--install', help="install a systemd service what runs every 8h",
+parser.add_argument('--install', help='install a systemd service what runs every 8h',
                     action='store_true' ,required=False
+                    )
+parser.add_argument('--env', '-e', '-dot', help='Define another Channnel/webhook file, best to add an dot (.webhook) to have a hidden file',
+                    default='.webhook', dest='dotwebhook_file', type=str
                     )
 
 args = parser.parse_args()
@@ -85,6 +72,36 @@ for cmd in args.systemd:
   systemd_listToStr = ' '.join([str(elem) for elem in cmd])
   systemd_check = ("systemctl status " + systemd_listToStr + " -l" )
   comands += [systemd_check] 
+
+env = Env()
+# add the script path to the dotwebhook_file
+script_dir = os.path.abspath( os.path.dirname( __file__ ) )
+if not "/" in args.dotwebhook_file:
+  dotwebhook_file = ( script_dir + '/' + args.dotwebhook_file )
+else:
+  dotwebhook_file = ( args.dotwebhook_file )
+env.read_env(dotwebhook_file)
+
+
+if not Path(dotwebhook_file).exists():
+    webhook_url = input("Enter your Discord webhook: \n")
+    file_name = dotwebhook_file
+    icon = "https://cdn.discordapp.com/attachments/879486731454406728/923670082377355304/unknown.png"
+    custom_icon = input("enter the URL of your Custom Icon. leave empty to use fallback: \n")
+    if custom_icon != "":
+      icon = custom_icon
+    dotwebhook = (f"webhook_url = \"{ webhook_url }\" \nicon = \"{ icon }\"")
+    mask = 0o0027
+    os.umask(mask)
+    f = open(file_name, 'a+')
+    f.write(dotwebhook)
+    f.close()
+env.read_env(dotwebhook_file)
+
+exit()
+
+
+
 
 # update
 if args.pull:
@@ -142,13 +159,11 @@ for cmd in comands:
       webhook = DiscordWebhook(url=(webhook_url), rate_limit_retry=True, content='```' + (part) + '```' )
       if out != "":
         response = webhook.execute()
-        time.sleep(1)
   else:
     out = out[:1990]
     webhook = DiscordWebhook(url=(webhook_url), rate_limit_retry=True, content='```' + (out) + '```' )
     if out != "":
       response = webhook.execute()
-      time.sleep(0.75)
 
 # https://pythonexamples.org/python-split-string-into-specific-length-chunks/
 # https://stackoverflow.com/questions/18854620/whats-the-best-way-to-split-a-string-into-fixed-length-chunks-and-work-with-the/18854817
