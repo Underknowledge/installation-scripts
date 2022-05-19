@@ -2,7 +2,7 @@
 function information { echo -e "\033[1;34m[Info]\033[0m $*"; }
 function warning  { echo -e "\033[0;33m[Warning]\033[0m $* "; }
 function error { echo -e "\033[0;31m[Error]\033[0m $*"; exit 1; }
-/home/user/github/Underknowledge/installation-scripts/GPG/generate-gpg-keys.sh
+
 # Create a GPG Key with subkeys and back them up properly.
 # Best practice to create a GPG key is to create the key on a live CD like Tails or Fedora. 
 # Do not reimport the Master key, Rather use only the sub keys. 
