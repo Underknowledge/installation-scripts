@@ -21,7 +21,10 @@ key_passphrase='Whenever_1_try2SetAPassISomeHowCreateVeryStrangeOnes:P' # GPG se
 key_realname='underknowledge'
 key_email='postmaster@underknowledge.cc'
 key_comment='This is an test key'
-
+# needed for yk_pin
+NEW_PIN="at least 6 chars"
+RESET_PIN="probably 6 chars"
+NEW_ADMIN_PIN="at least 8 chars"
 
 GNUPGHOME="$(pwd)/$( echo ${key_realname} | tr -cd '[:alnum:]._-')"
 mkdir -p  "$GNUPGHOME"/logs
@@ -29,8 +32,9 @@ mkdir -p  "$GNUPGHOME"/logs
 information "Exports to $GNUPGHOME"
 
 
+
 help () {
-  cat << EOF
+cat << EOF
 Usage: ./GPG/generate-gpg-keys.sh [full, export_keys import_keys help]
 At the end of the script is a $1 (Argument 1) you can easyly call every function with this. 
 by default this script will create a folder with the name 
@@ -41,8 +45,17 @@ by default this script will create a folder with the name
   Ment to be used with a nitro or yubikey 
 
 General options:
+
   full:
-    master:
+    gpg: 
+     - From below, Create and export keys
+    keytocard:
+      - Copy the Keys to the yubikey 
+    yk_pin:
+      - Change the pins
+
+  gpg_gen:
+    gen_master:
       - Creates a Ultimate trust GPG key
     sub_auth:
       - Creates a Sub-key for authentification (e.g. ssh)
@@ -69,12 +82,16 @@ General options:
     import_sub_secret:
       - imorts the sub-key
   
-  yk_keytocard:
+  keytocard:
     - To be run after full, copy's subkeys to a yubikey
+
+  yk_pin:
+    - Change the default pins
+
 EOF
 }
 
-master () {
+gen_master () {
 curl -sL https://raw.githubusercontent.com/drduh/config/master/gpg.conf -o $GNUPGHOME/gpg.conf
  information "Create master key"
  # gpg --default-new-key-algo rsa4096 --gen-key ?https://docs.github.com/en/enterprise-server@3.1/authentication/managing-commit-signature-verification/generating-a-new-gpg-key
@@ -295,43 +312,6 @@ import_sub_secret () {
 }
 
 
-full () {
-    master
-    sub_auth
-    sub_sign
-    sub_encrypt
-    revoke
-    export_keys
-}
-
-
-export_keys () {
-    export_master_secret
-    export_subkey_secret
-    export_public
-    export_ownertrust
-}
-
-
-import_keys () {
-  import_master_secret
-  import_sub_secret
-  import_public
-}
-
-import_public () {
-  gpg --batch --command-fd=/dev/stdin --status-fd=/dev/stdout \
-  --pinentry-mode=loopback \
-  --import "$GNUPGHOME"/pubkey.txt
-
-}
-
-
-import_public_keys () {
-  import_public
-  import_ownertrust
-}
-
 
 
 GPG_DELETE () {
@@ -344,21 +324,7 @@ GPG_DELETE () {
   done
 }
 
-RENAMEME () {
-    yk_reset
-    yk_keytocard
-} 
-
-
-yk_reset () {
-  warning "Delete all GPG keys From the yubikey"
-  ykman openpgp reset
-}
-
-
-
-yk_keytocard () {
-
+keytocard () {
   # DEPENDENCYS 
   # yubikey-manager xdotool
   information "Key to Card"
@@ -372,6 +338,7 @@ yk_keytocard () {
   warning ""
   warning "WE WILL RESET OpenGPG ON THE YUBIKEY! DO NOT PROCEED WHEN YOU DONT WANT THIS"
   warning ""
+
 
   SORT=($(gpg --keyid-format LONG --list-keys ${KEYID} | grep -oe '\[.\]' | grep -o '[[:alpha:]]'))
   for i in ${!SORT[@]}; do
@@ -405,16 +372,85 @@ yk_keytocard () {
   done
   echo
 
-  ykman openpgp reset -f
+    yk_reset
+    yk_keytocard
+} 
 
+
+yk_reset () {
+  warning "deleting all GPG keys From the yubikey"
+  ykman openpgp reset -f
+}
+
+yk_pin () {
+  # Wait
+  secs=5
+  while [ $secs -gt 0 ]
+  do
+    printf "\r\033[KWaiting %.d seconds $msg" $((secs--))
+    sleep 1
+  done
+  echo
+
+  xdotool sleep 1 type "gpg --change-pin"
+  xdotool sleep 1 key KP_Enter
+
+    information "set the Reset Code"
+  xdotool sleep 1 type "4" 
+  xdotool sleep 1 key KP_Enter
+  
+    information "provide admin pin" 
+  xdotool sleep 2 type "12345678"
+  xdotool sleep 2 key KP_Enter
+
+    information "provide new RESET_PIN 1" 
+  xdotool sleep 2 type "$RESET_PIN"
+  xdotool sleep 2 key KP_Enter
+    information "provide new RESET_PIN 2" 
+  xdotool sleep 4 type "$RESET_PIN"
+  xdotool sleep 2 key KP_Enter
+
+
+
+    information "change PIN" 
+  xdotool sleep 2 key 1
+  xdotool sleep 2 key KP_Enter
+
+  xdotool sleep 2 type "123456"
+  xdotool sleep 2 key KP_Enter
+    information "provide new NEW_PIN 1" 
+  xdotool sleep 2 type "$NEW_PIN"
+  xdotool sleep 2 key KP_Enter
+    information "provide new NEW_PIN 2" 
+  xdotool sleep 2 type "$NEW_PIN"
+  xdotool sleep 2 key KP_Enter
+
+
+    information "change Admin PIN" 
+  xdotool sleep 2 key 3
+  xdotool sleep 2 key KP_Enter
+
+  xdotool sleep 2 type "12345678"
+  xdotool sleep 2 key KP_Enter
+    information "provide new NEW_ADMIN_PIN 1" 
+  xdotool sleep 2 type "$NEW_ADMIN_PIN"
+  xdotool sleep 2 key KP_Enter
+    information "provide new NEW_ADMIN_PIN 2" 
+  xdotool sleep 2 type "$NEW_ADMIN_PIN"
+  xdotool sleep 2 key KP_Enter
+
+    information "quit" 
+  xdotool sleep 2 type "q"
+  xdotool sleep 2 key KP_Enter
+}
+
+yk_keytocard () {
+  [ -n "$aut_key_num" ] || error "Authentication key not found"
+  [ -n "$sig_key_num" ] || error "Signing key not found"
+  [ -n "$enc_key_num" ] || error "Encryption key not found"
 
   xdotool sleep 1 type  "gpg --expert --key-edit \"$KEYID\" "
   xdotool sleep 1 key KP_Enter
-
-# S slot 1
-# E slot 2
-# A slot 3 
-
 
 # S slot 1
     information "S mark Sig key ${sig_key_num} "
@@ -431,7 +467,7 @@ yk_keytocard () {
   xdotool sleep 3 type "$key_passphrase"
   xdotool sleep 5 key KP_Enter
 
-    information "S provide admin pin" # ISSUE??
+    information "S provide admin pin" # bug??
   xdotool sleep 3 key 1
   xdotool sleep 3 type "2345678"
   xdotool sleep 5 key KP_Enter
@@ -510,7 +546,56 @@ yk_keytocard () {
 }
 
 
+
+
+
+full () {
+  gpg_gen
+  keytocard
+  yk_pin
+}
+
+
+gpg_gen () {
+    gen_master
+    sub_auth
+    sub_sign
+    sub_encrypt
+    revoke
+    export_keys
+}
+
+
+export_keys () {
+    export_master_secret
+    export_subkey_secret
+    export_public
+    export_ownertrust
+}
+
+
+import_keys () {
+  import_master_secret
+  import_sub_secret
+  import_public
+}
+
+import_public () {
+  gpg --batch --command-fd=/dev/stdin --status-fd=/dev/stdout \
+  --pinentry-mode=loopback \
+  --import "$GNUPGHOME"/pubkey.txt
+}
+
+
+import_public_keys () {
+  import_public
+  import_ownertrust
+}
+
+
+
 $1
+
 
 information "when the master key has '#' at the end ('sec#') means that the private key is not present."
 gpg --keyid-format LONG --list-keys
