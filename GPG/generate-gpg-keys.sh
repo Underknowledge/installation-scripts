@@ -480,6 +480,11 @@ keytocard () {
     sleep 1
   done
   echo
+  until gpg --card-status 2> /dev/null ; do
+    echo "OpenPGP card not available, try to replug it"
+    echo "Waiting for smartcard..."
+    sleep 10
+  done
 
     yk_reset
     yk_keytocard
