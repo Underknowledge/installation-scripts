@@ -1,4 +1,17 @@
 #!/usr/bin/env bash
+
+# Following lines could be put in a file and be sourced
+
+key_passphrase='Whenever_1_trY2SetAPassISomeHowCreateVeryStrangeOnes:P' # GPG secret key passphrase.
+key_realname='underknowledge'
+key_email='postmaster@underknowledge.cc'
+key_comment='This is an test key'
+# needed for yk_pin
+NEW_PIN="at least 6 chars"
+RESET_PIN="probably 6 chars"
+NEW_ADMIN_PIN="at least 8 chars"
+
+
 function information { echo -e "\033[1;34m[Info]\033[0m $*"; }
 function warning  { echo -e "\033[0;33m[Warning]\033[0m $* "; }
 function error { echo -e "\033[0;31m[Error]\033[0m $*"; exit 1; }
@@ -41,19 +54,6 @@ SUB_KEY_EXPIRE="5y"
 # - Provide help for SSH authentfication via GPG
 # - error when exported key size is 0
 
-
-
-# Following lines should be put in a file and be sourced
-sc_puk='123456789012' # Smartcard admin PIN/PUK.
-sc_pin='WhateverAPinIsMentToBe' # Smartcard user PIN.
-key_passphrase='Whenever_1_try2SetAPassISomeHowCreateVeryStrangeOnes:P' # GPG secret key passphrase.
-key_realname='underknowledge'
-key_email='postmaster@underknowledge.cc'
-key_comment='This is an test key'
-# needed for yk_pin
-NEW_PIN="at least 6 chars"
-RESET_PIN="probably 6 chars"
-NEW_ADMIN_PIN="at least 8 chars"
 
 
 GNUPGHOME="$(pwd)/$( echo ${key_realname} | tr -cd '[:alnum:]._-')"
