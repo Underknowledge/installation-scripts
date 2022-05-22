@@ -3,15 +3,44 @@ function information { echo -e "\033[1;34m[Info]\033[0m $*"; }
 function warning  { echo -e "\033[0;33m[Warning]\033[0m $* "; }
 function error { echo -e "\033[0;31m[Error]\033[0m $*"; exit 1; }
 scriptname=`basename "$0"`
+pathappend() {
+    for ARG in "$@"
+    do
+        if [ -d "$ARG" ] && [[ ":$PATH:" != *":$ARG:"* ]]
+        then
+            if ARGA=$(readlink -f "$ARG")
+            then
+                if [ -d "$ARGA" ] && [[ ":$PATH:" != *":$ARGA:"* ]]
+                then
+                    PATH="${PATH:+"$PATH:"}$ARGA"
+                fi
+            else
+                PATH="${PATH:+"$PATH:"}$ARG"
+            fi
+        fi
+    done
+}
+
+# Tested in tails and fedora
+source /usr/lib/os-release
+case ${ID,,} in
+    *suse*) pkg_mgr_cmd="zypper -n in" ;;
+    centos|rhel|fedora) pkg_mgr_cmd="dnf install -y" ;;
+    ubuntu|debian) pkg_mgr_cmd="apt-get install -y" ;;
+    # Gentoo needs to have version set since it's rolling
+    gentoo) pkg_mgr_cmd="emerge --jobs=4"; VERSION="rolling" ;;
+    *) pkg_mgr_cmd="install" ; echo "unsupported distro: ${ID,,}";;
+esac
+
+command -v ykman > /dev/null 2>&1 || error "Please install yubikey-manager first: 'sudo ${pkg_mgr_cmd} yubikey-manager'"
+command -v xdotool > /dev/null 2>&1 || error "Please install xdotool first: 'sudo ${pkg_mgr_cmd} xdotool'"
+
+SUB_KEY_EXPIRE="5y"
 
 # Todo list: 
-# - Sub-key expire to a variable
 # - Provide help for SSH authentfication via GPG
+# - error when exported key size is 0
 
-# Create a GPG Key with subkeys and back them up properly.
-# Best practice to create a GPG key is to create the key on a live CD like Tails or Fedora. 
-# Do not reimport the Master key, Rather use only the sub keys. 
-# Ment to be used with a nitro or yubikey
 
 
 # Following lines should be put in a file and be sourced
@@ -26,23 +55,92 @@ NEW_PIN="at least 6 chars"
 RESET_PIN="probably 6 chars"
 NEW_ADMIN_PIN="at least 8 chars"
 
+
 GNUPGHOME="$(pwd)/$( echo ${key_realname} | tr -cd '[:alnum:]._-')"
-mkdir -p  "$GNUPGHOME"/logs
 
-information "Exports to $GNUPGHOME"
+# creates a folder in the current working dir, based on the ${key_realname} variabe, when you set $CRYPTSETUP it will create a luks container for you and mount it
+prepare_location () {
+  mkdir -p  "$GNUPGHOME"
+  # When we set the var CRYPTSETUP, we set it up, otherwise we just create a folder
+  if [[ -n $CRYPTSETUP ]]
+  then
+     # tails hides cryptsetup in here
+    [[ -d "/sbin" ]] &&  pathappend  /sbin
+      if [[ -f "gpg_store_${key_email//@/_at_}" ]]
+      then 
+        echo "File exists, proceed to mount"
+        information "Opening the encrypted luks"
+        if [[ -L "/dev/mapper/gpg_${key_email//@/_at_}" ]]
+        then
+            echo "the luks is already open"
+        else 
+          sudo cryptsetup -v luksOpen gpg_store_${key_email//@/_at_} gpg_${key_email//@/_at_} || error "Failed to open the luks, try again"
+        fi
+        information "Mounting the encrypted luks"
+        if [[ $(mountpoint "$GNUPGHOME") ]]
+        then
+            echo "already mounted"
+        else
+          sudo mount /dev/mapper/gpg_${key_email//@/_at_} "$GNUPGHOME"
+        fi
+      else 
+      echo "Need to setup"
+        (umask 177 && fallocate --length 50M gpg_store_${key_email//@/_at_} )
+        # theoretical you dont need sudo for it, but I get a OoM error in my tails VM without it
+        information "This might take a little while"
+        warning "first, you need to provide the sudo password, then type YES"
+        warning ""
+        warning "Then you set the luke password, be sure to remember it!!! "
+        warning ""
+        sudo cryptsetup -v luksFormat gpg_store_${key_email//@/_at_} || error "Failed to format the file to a luks, sadly that is somehow expected, just try again from the start. Please run 'rm -f gpg_store_${key_email//@/_at_}'"
+        information "Opening the encrypted luks"
+        sudo cryptsetup -v luksOpen gpg_store_${key_email//@/_at_} gpg_${key_email//@/_at_} || error "Failed to open the luks, try again from the start. Please run 'rm -f gpg_store_${key_email//@/_at_}'"
+        information "Creating a filesystem on the luks"
+        sudo mkfs -t ext4 /dev/mapper/gpg_${key_email//@/_at_} || error "Failed to format the luks, rather unexpected, but try again from the start. Please run 'rm -f gpg_store_${key_email//@/_at_}'"
+        information "Mount it and set permissions"
+        sudo mount /dev/mapper/gpg_${key_email//@/_at_} "$GNUPGHOME" ; suco chmod 700 "$GNUPGHOME" ; sudo chown ${$USER}:${$USER} "$GNUPGHOME" ;  mkdir -p "$GNUPGHOME"/logs
+      fi 
+  else
+    mkdir -p  "$GNUPGHOME"/logs
+  fi
+  information "Exports to $GNUPGHOME"
+}
+# just call the above, dont want to put the function in every thing what might create data
+prepare_location
 
+unmount_luks () {
+
+  if [[ $(mountpoint "$GNUPGHOME") ]]
+  then
+    information "unmounting $GNUPGHOME"
+    sudo umount $GNUPGHOME
+
+    information "Closing luks  gpg_${key_email//@/_at_}"
+    sudo cryptsetup luksClose gpg_${key_email//@/_at_}
+  fi
+
+
+}
 
 
 help () {
 cat << EOF
 Usage: ./GPG/generate-gpg-keys.sh [full, export_keys import_keys help]
-At the end of the script is a $1 (Argument 1) you can easyly call every function with this. 
+At the end of the script is a \$1 (Argument 1) you can easyly call every function with this. 
 by default this script will create a folder with the name 
 
   Create a GPG Key with subkeys and back them up properly.
-  Best practice to create a GPG key is to create the key on a live CD like Tails or Fedora. 
+  Best practice to create a GPG key is to create the key on a live CD like Tails. 
   Do not reimport the Master key, Rather use only the sub keys. 
-  Ment to be used with a nitro or yubikey 
+  Ment to be used with a yubikey 
+
+  When you like to set up a luks container to store your secrets, set the var 'CRYPTSETUP' to something like true or 1 
+  e.g. 
+    export CRYPTSETUP=1 ; 
+    CRYPTSETUP=true $scriptname full
+
+Big thanks to drduh and all the Contributors for https://github.com/drduh/YubiKey-Guide
+special shoutout to woodenphone for the starting material https://github.com/drduh/YubiKey-Guide/issues/244#issuecomment-903276447 (---export ;) )
 
 General options:
 
@@ -92,6 +190,8 @@ EOF
 }
 
 gen_master () {
+prepare_location
+
 curl -sL https://raw.githubusercontent.com/drduh/config/master/gpg.conf -o $GNUPGHOME/gpg.conf
  information "Create master key"
  # gpg --default-new-key-algo rsa4096 --gen-key ?https://docs.github.com/en/enterprise-server@3.1/authentication/managing-commit-signature-verification/generating-a-new-gpg-key
@@ -112,14 +212,18 @@ q
 0
 y
 ## Key user details
-$key_realname
-$key_email
-$key_comment
+${key_realname}
+${key_email}
+${key_comment}
 ## Save and exit
 save
 EOF-create-master-key
 
-gpg --list-keys | grep "$key_email" -B1 | head -n 1 | xargs > "$GNUPGHOME"/KEYID.txt
+# Fedora only 
+# gpg --list-keys | grep "$key_email" -B1 | head -n 1 | xargs > "$GNUPGHOME"/KEYID.txt
+
+gpg2 --fingerprint ${key_email} | head -n2 | tail -n1  | cut -d "=" -f 2 | grep '[[:alnum:]]' | tr -d ' ' > "$GNUPGHOME"/KEYID.txt
+
 KEYID="$(cat "$GNUPGHOME"/KEYID.txt)"
 
 }
@@ -142,6 +246,8 @@ source_keyid () {
 revoke () {
   source_keyid
   warning "START REVOKE"
+
+  xdotool sleep 5 key KP_Enter & # hack, lol
 gpg --command-fd=/dev/stdin --status-fd=/dev/stdout \
     --pinentry-mode=loopback --passphrase="$key_passphrase" \
     --output "$GNUPGHOME"/revocation.crt --gen-revoke "${KEYID}" 2>&1 | tee -a "$GNUPGHOME"/logs/revoce.txt <<EOF-create-revocation-crt
@@ -181,7 +287,7 @@ q
 # What keysize do you want? (3072)
 4096
 # Key is valid for? (0)
-0
+${SUB_KEY_EXPIRE}
 # Key does not expire at all
 ## Save and exit
 save
@@ -216,7 +322,7 @@ q
 # What keysize do you want? (3072)
 4096
 # Key is valid for? (0)
-0
+${SUB_KEY_EXPIRE}
 # Key does not expire at all
 ## Save and exit
 save
@@ -250,7 +356,7 @@ q
 # What keysize do you want? (3072)
 4096
 # Key is valid for? (0)
-0
+${SUB_KEY_EXPIRE}
 # Key does not expire at all
 ## Save and exit
 save
@@ -272,7 +378,7 @@ export_subkey_secret () {
 gpg --command-fd=/dev/stdin --status-fd=/dev/stdout \
     --pinentry-mode=loopback  --passphrase="$key_passphrase" \
     --armor \
-    --export-secret-subkeys --export-options export-backup "${KEYID}" > "$GNUPGHOME"/sub-secret-keys.gpg
+    --export-secret-subkeys "${KEYID}" > "$GNUPGHOME"/sub-secret-keys.gpg
 }
 
 export_public () {
@@ -280,8 +386,8 @@ export_public () {
   #     --pinentry-mode=loopback  --passphrase="$key_passphrase" \
   #     --armor \
   #     --export "${KEYID}" > "$GNUPGHOME"/pubkey.txt
-  gpg --output public.pgp --armor --export "${KEYID}" 
-  gpg --export-ssh-key "${KEYID}" > "$GNUPGHOME"/ssh-key_${key_realname}.pub
+  gpg --output "$GNUPGHOME"/public-${key_email//@/_at_}.pgp --armor --export "${KEYID}" 
+  gpg --export-ssh-key "${KEYID}" > "$GNUPGHOME"/ssh-key_${key_email//@/_at_}.pub
 }
 
 export_ownertrust () {
@@ -297,7 +403,7 @@ import_ownertrust () {
 import_master_secret () {
   gpg --batch --command-fd=/dev/stdin --status-fd=/dev/stdout \
   --pinentry-mode=loopback --passphrase="$key_passphrase" \
-  --import "$GNUPGHOME"/master-secret-key.gpg
+  --import "$GNUPGHOME"/master-secret-key-${key_email//@/_at_}.gpg
 
   import_ownertrust
 }
@@ -306,7 +412,7 @@ import_master_secret () {
 import_sub_secret () {   
   gpg --batch --command-fd=/dev/stdin --status-fd=/dev/stdout \
   --pinentry-mode=loopback --passphrase="$key_passphrase" \
-  --import "$GNUPGHOME"/sub-secret-keys.gpg
+  --import "$GNUPGHOME"/sub-secret-keys-${key_email//@/_at_}.gpg
 
   import_ownertrust
 }
@@ -316,7 +422,7 @@ import_sub_secret () {
 
 GPG_DELETE () {
   gpg --list-keys
-  CURRENT_KEYS=$(gpg --list-secret-keys --with-colons | awk -F: '/fpr/ { print $10 }')
+  CURRENT_KEYS=$(gpg --list-secret-keys --with-colons --fingerprint ${key_email} | awk -F: '/fpr/ { print $10 }')
   for id in $CURRENT_KEYS
   do
     gpg --delete-secret-key $id 
@@ -327,6 +433,9 @@ GPG_DELETE () {
 keytocard () {
   # DEPENDENCYS 
   # yubikey-manager xdotool
+  # apt-get install -y yubikey-manager yubikey-manager-qt xdotool
+  # sudo pkill -9 pcscd
+
   information "Key to Card"
   source_keyid
   warning "This is utterly ugly hacked together, if you have a better idea.... Please! "
@@ -383,6 +492,13 @@ yk_reset () {
 }
 
 yk_pin () {
+
+
+
+# NEW_PIN_LEN=${#NEW_PIN}
+# RESET_PIN_LEN=${#RESET_PIN}
+# NEW_ADMIN_PIN_LEN=${#NEW_ADMIN_PIN}
+
   # Wait
   secs=5
   while [ $secs -gt 0 ]
@@ -467,12 +583,12 @@ yk_keytocard () {
   xdotool sleep 3 type "$key_passphrase"
   xdotool sleep 5 key KP_Enter
 
-    information "S provide admin pin" # bug??
+    information "S provide admin pin" 
   xdotool sleep 3 key 1
   xdotool sleep 3 type "2345678"
   xdotool sleep 5 key KP_Enter
   ## TODO 
-    information "S provide admin pin the seccond time?.... must be a bug due to 100 tryes"
+    information "S provide admin pin the seccond time" # bug? apperantly not, whyever
   xdotool sleep 3 key 1
   xdotool sleep 3 type "2345678"
   xdotool sleep 5 key KP_Enter
@@ -599,6 +715,15 @@ $1
 
 information "when the master key has '#' at the end ('sec#') means that the private key is not present."
 gpg --keyid-format LONG --list-keys
+unset CRYPTSETUP
+if [[ $(mountpoint "$GNUPGHOME") ]]
+then
+    warning "The luks is MOUNTED"
+    warning "When you want to unmount it, run:"
+    warning "$scriptname unmount_luks"
+fi
+
 
 ## See:
 ##> https://www.gnupg.org/documentation/manuals/gnupg/Unattended-GPG-key-generation.html#Unattended-GPG-key-generation
+
